@@ -1,0 +1,374 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Evaluator | DSTAIR{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/ai-user.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="ai-eva-page" x-data="aiEvaluator()">
+
+    <div class="ai-eva-bg">
+        <div class="ai-eva-grid"></div>
+        <div class="ai-eva-orb"></div>
+    </div>
+
+    <div class="ai-eva-wrap">
+        <!-- Header -->
+        <div class="ai-eva-head">
+            <div class="ai-eva-badge">
+                <div class="ai-eva-dot"></div>
+                <span class="ai-eva-btxt">Neural Engine</span>
+            </div>
+            <h1 class="ai-eva-h1">AI Evaluator</h1>
+            <p class="ai-eva-sub">
+                Trigger an automated institutional analysis for any country. The AI engine will evaluate all spheres and
+                generate a full legitimacy assessment.
+            </p>
+        </div>
+
+        <!-- No keys warning (blocks submission) -->
+        {% set has_any_key = active_keys | length > 0 or has_system_key %}
+        {% if not has_any_key %}
+        <div class="ai-eva-nokey-banner">
+            <div class="ai-eva-nokey-ico">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+            </div>
+            <div class="ai-eva-nokey-body">
+                <strong>No API Keys Configured</strong>
+                <p>You need at least one active API key to run an evaluation.
+                   <a href="{{ url_for('ai_dashboard.api_keys') }}" class="ai-eva-nokey-link">Set up API keys &rarr;</a>
+                </p>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Evaluation Form Card -->
+        <div class="ai-eva-card">
+            <div class="ai-eva-ctitle">
+                <div class="ai-eva-cicon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    </svg>
+                </div>
+                Run Evaluation
+            </div>
+
+            <!-- Country Selection -->
+            <div class="ai-eva-grp">
+                <label class="ai-eva-lbl">Target Country</label>
+                <div class="ai-eva-inp-wrap" x-data="{ searchQuery: '', showDropdown: false, filteredCountries: [] }"
+                    x-init="filteredCountries = countries">
+                    <input type="text" class="ai-eva-inp is-search" x-model="searchQuery" @focus="showDropdown = true"
+                        @input="filteredCountries = countries.filter(c => c.toLowerCase().includes(searchQuery.toLowerCase())); showDropdown = true"
+                        @click.away="showDropdown = false" :placeholder="country || 'Search for a country...'">
+
+                    <div x-show="country && !showDropdown"
+                        @click="showDropdown = true; searchQuery = ''; filteredCountries = countries"
+                        class="ai-eva-sel-badge">
+                        <span class="ai-eva-sel-txt" x-text="country"></span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" class="ai-eva-sel-ico">
+                            <polyline points="6 9 12 15 18 9" />
+                        </svg>
+                    </div>
+
+                    <div x-show="showDropdown && filteredCountries.length > 0" x-transition class="ai-eva-dd">
+                        <template x-for="c in filteredCountries" :key="c">
+                            <button type="button" @click="country = c; searchQuery = c; showDropdown = false"
+                                class="ai-eva-dd-btn" :class="{ 'is-active': c === country }">
+                                <span x-text="c"></span>
+                                <span x-show="evaluatedCountries.includes(c)" class="ai-eva-dd-has-data">✓ data</span>
+                            </button>
+                        </template>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Model / Key Picker -->
+            <div class="ai-eva-grp">
+                <label class="ai-eva-lbl">
+                    AI Model
+                    <span class="ai-eva-lbl-opt">(which key to use)</span>
+                </label>
+
+                {% if active_keys or has_system_key %}
+                <div class="ai-eva-keypicker">
+                    <!-- Auto option -->
+                    <label class="ai-eva-keyopt" :class="{ 'is-selected': selectedKeyId === '' }">
+                        <input type="radio" name="ai_key" value="" x-model="selectedKeyId" class="ai-eva-keyopt-radio">
+                        <div class="ai-eva-keyopt-body">
+                            <div class="ai-eva-keyopt-name">Auto (best available)</div>
+                            <div class="ai-eva-keyopt-sub">Tries your keys in priority order, falls back to system key if set</div>
+                        </div>
+                        <div class="ai-eva-keyopt-check" x-show="selectedKeyId === ''">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                        </div>
+                    </label>
+
+                    {% for key in active_keys %}
+                    <label class="ai-eva-keyopt" :class="{ 'is-selected': selectedKeyId === '{{ key.id }}' }">
+                        <input type="radio" name="ai_key" value="{{ key.id }}" x-model="selectedKeyId" class="ai-eva-keyopt-radio">
+                        <div class="ai-eva-keyopt-icon ai-eva-keyopt-icon--{{ key.provider }}">{{ key.label[0] | upper }}</div>
+                        <div class="ai-eva-keyopt-body">
+                            <div class="ai-eva-keyopt-name">{{ key.label }}</div>
+                            <div class="ai-eva-keyopt-sub">{{ key.masked_key }}</div>
+                        </div>
+                        <div class="ai-eva-keyopt-check" x-show="selectedKeyId === '{{ key.id }}'">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                        </div>
+                    </label>
+                    {% endfor %}
+
+                    {% if has_system_key %}
+                    <label class="ai-eva-keyopt" :class="{ 'is-selected': selectedKeyId === 'system' }">
+                        <input type="radio" name="ai_key" value="system" x-model="selectedKeyId" class="ai-eva-keyopt-radio">
+                        <div class="ai-eva-keyopt-icon ai-eva-keyopt-icon--groq">G</div>
+                        <div class="ai-eva-keyopt-body">
+                            <div class="ai-eva-keyopt-name">System Key (Groq)</div>
+                            <div class="ai-eva-keyopt-sub">Shared environment key — fallback only</div>
+                        </div>
+                        <div class="ai-eva-keyopt-check" x-show="selectedKeyId === 'system'">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+                        </div>
+                    </label>
+                    {% endif %}
+                </div>
+                {% else %}
+                <div class="ai-eva-nokey-inline">
+                    No active API keys. <a href="{{ url_for('ai_dashboard.api_keys') }}" class="ai-eva-nokey-link">Add one &rarr;</a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Additional Instructions -->
+            <div class="ai-eva-grp">
+                <label class="ai-eva-lbl">Additional Instructions <span class="ai-eva-lbl-opt">(Optional)</span></label>
+                <textarea class="ai-eva-tarea" x-model="additionalInstructions" rows="3"
+                    placeholder="e.g. Focus on recent 2024 reforms, compare with regional averages, emphasize judicial independence..."></textarea>
+            </div>
+
+            <!-- Submit Button -->
+            <button class="ai-eva-submit" @click="runEvaluation()"
+                    :disabled="loading || !hasKeys">
+                <template x-if="!loading">
+                    <span class="ai-eva-scontent">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <polygon points="5 3 19 12 5 21 5 3" />
+                        </svg>
+                        Execute Analysis
+                    </span>
+                </template>
+                <template x-if="loading">
+                    <span class="ai-eva-scontent">
+                        <svg class="ai-eva-sspin" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none"
+                            viewBox="0 0 24 24">
+                            <circle opacity="0.25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path opacity="0.75" fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                            </path>
+                        </svg>
+                        Analyzing...
+                    </span>
+                </template>
+            </button>
+        </div>
+
+        <!-- Results Panel -->
+        <div class="ai-eva-res" :class="{'is-visible': resultVisible}">
+            <h3 class="ai-eva-rh3">Evaluation Complete</h3>
+            <div class="ai-eva-rstat">
+                <div class="ai-eva-rico">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                        <polyline points="22 4 12 14.01 9 11.01" />
+                    </svg>
+                </div>
+                <span class="ai-eva-rtxt" x-text="resultMessage"></span>
+            </div>
+            <a :href="resultLink" class="ai-eva-rlink">
+                View Full Results
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2.5" class="ai-eva-rgo">
+                    <path d="M5 12h14" />
+                    <path d="m12 5 7 7-7 7" />
+                </svg>
+            </a>
+        </div>
+
+        <!-- Raw API Communication (shown after evaluation completes) -->
+        <div class="ai-eva-raw" x-show="rawVisible" x-transition>
+            <div class="ai-eva-raw-header">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                Raw API Communication
+                <span class="ai-eva-raw-badge" x-text="rawProvider + (rawModel ? ' / ' + rawModel : '')"></span>
+            </div>
+
+            <div class="ai-eva-raw-endpoint" x-show="rawEndpoint">
+                <span class="ai-eva-raw-method">POST</span>
+                <span class="ai-eva-raw-url" x-text="rawEndpoint"></span>
+            </div>
+
+            <details class="ai-eva-raw-details">
+                <summary class="ai-eva-raw-summary">
+                    <span class="ai-eva-raw-slabel">Request Payload</span>
+                    <span class="ai-eva-raw-shint">sent to AI provider</span>
+                    <svg class="ai-eva-raw-chevron" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                </summary>
+                <pre class="ai-eva-raw-pre ai-eva-raw-pre--req" x-text="rawRequest"></pre>
+            </details>
+
+            <details class="ai-eva-raw-details">
+                <summary class="ai-eva-raw-summary">
+                    <span class="ai-eva-raw-slabel">Response Received</span>
+                    <span class="ai-eva-raw-shint">raw API response</span>
+                    <svg class="ai-eva-raw-chevron" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                </summary>
+                <pre class="ai-eva-raw-pre ai-eva-raw-pre--res" x-text="rawResponse"></pre>
+            </details>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function aiEvaluator() {
+        return {
+            country: '',
+            additionalInstructions: '',
+            selectedKeyId: '',
+            loading: false,
+            resultVisible: false,
+            resultMessage: '',
+            resultLink: '',
+            rawVisible: false,
+            rawProvider: '',
+            rawModel: '',
+            rawEndpoint: '',
+            rawRequest: '',
+            rawResponse: '',
+            hasKeys: {{ 'true' if (active_keys | length > 0 or has_system_key) else 'false' }},
+            countries: {{ all_countries | map(attribute='name') | list | tojson }},
+            evaluatedCountries: {{ evaluated_countries | list | tojson }},
+
+            async runEvaluation() {
+                if (!this.country.trim()) {
+                    if (typeof showToast === 'function') showToast('Please select a country.', 'error');
+                    else alert('Please select a country.');
+                    return;
+                }
+                if (!this.hasKeys) {
+                    if (typeof showToast === 'function') showToast('No API keys configured.', 'error');
+                    return;
+                }
+
+                this.loading = true;
+                this.resultVisible = false;
+                this.rawVisible = false;
+                this.resultMessage = 'Starting AI evaluation...';
+
+                try {
+                    const body = {
+                        country: this.country.trim(),
+                        additional_instructions: this.additionalInstructions.trim(),
+                    };
+                    if (this.selectedKeyId !== '') {
+                        body.selected_key_id = this.selectedKeyId;
+                    }
+
+                    const response = await fetch('{{ url_for("ai_dashboard.evaluate") }}', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() },
+                        body: JSON.stringify(body)
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        this.analysisId = data.analysis_id;
+                        this.resultLink = `/ai/analysis/${data.analysis_id}`;
+                        this.resultVisible = true;
+                        this.resultMessage = 'AI analysis started. Monitoring progress...';
+                        if (typeof showToast === 'function') showToast(data.message || 'Evaluation started.', 'success');
+                        await this.pollAnalysisStatus(data.analysis_id);
+                    } else {
+                        if (typeof showToast === 'function') showToast(data.error || 'Evaluation failed.', 'error');
+                        this.resultMessage = 'Evaluation failed to start.';
+                        this.resultVisible = true;
+                    }
+                } catch (error) {
+                    if (typeof showToast === 'function') showToast('Network error. Please try again.', 'error');
+                    this.resultMessage = 'Network error during request.';
+                    this.resultVisible = true;
+                } finally {
+                    this.loading = false;
+                }
+            },
+
+            async pollAnalysisStatus(analysisId) {
+                const intervalMs = 2000;
+                let attempts = 0;
+                const maxAttempts = 120;
+
+                while (attempts < maxAttempts) {
+                    attempts += 1;
+                    await new Promise(resolve => setTimeout(resolve, intervalMs));
+
+                    try {
+                        const statusResp = await fetch(`/ai/analysis/${analysisId}/status`, {
+                            method: 'GET',
+                            headers: { 'Content-Type': 'application/json' }
+                        });
+                        const statusData = await statusResp.json();
+
+                        if (!statusData) continue;
+
+                        if (statusData.status === 'error') {
+                            this.resultMessage = 'AI evaluation failed. Check logs in archive.';
+                            if (typeof showToast === 'function') showToast('AI evaluation failed.', 'error');
+                            return;
+                        }
+
+                        if (statusData.completed) {
+                            this.resultMessage = 'AI Evaluation complete. View your results below.';
+                            this.resultLink = `/ai/analysis/${analysisId}`;
+                            if (typeof showToast === 'function') showToast('AI evaluation completed successfully.', 'success');
+
+                            // Populate raw API viewer from metadata
+                            const meta = statusData.metadata || {};
+                            if (meta.sample_raw_request || meta.sample_raw_response) {
+                                this.rawProvider  = meta.provider_used || '';
+                                this.rawModel     = meta.model_used || '';
+                                this.rawEndpoint  = meta.sample_raw_endpoint || '';
+                                this.rawRequest   = meta.sample_raw_request
+                                    ? JSON.stringify(meta.sample_raw_request, null, 2)
+                                    : '';
+                                this.rawResponse  = meta.sample_raw_response
+                                    ? JSON.stringify(meta.sample_raw_response, null, 2)
+                                    : '';
+                                this.rawVisible = true;
+                            }
+                            return;
+                        }
+
+                        this.resultMessage = `Status: ${statusData.status || 'in_progress'} — ${statusData.metadata?.stage || ''}`;
+
+                    } catch (error) {
+                        console.warn('AI status polling error:', error);
+                    }
+                }
+
+                this.resultMessage = 'AI evaluation timed out waiting for completion.';
+                if (typeof showToast === 'function') showToast(this.resultMessage, 'error');
+            }
+        };
+    }
+</script>
+{% endblock %}

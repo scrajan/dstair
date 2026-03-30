@@ -1,0 +1,590 @@
+{% extends "base.html" %}
+
+{% block title %}FAQ - DSTAIR Institutional Analytics{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* --------------------------------------------------------------------------
+   GLOBAL & LAYOUT
+   -------------------------------------------------------------------------- */
+    :root {
+        --faq-indigo: #6366f1;
+        --faq-slate: #f1f5f9;
+        --faq-dark: #0f172a;
+        --faq-glass: rgba(255, 255, 255, 0.82);
+        --faq-border: rgba(255, 255, 255, 0.8);
+    }
+
+    .faq-wrapper {
+        background: #020617;
+        color: #f8fafc;
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+
+    /* --------------------------------------------------------------------------
+   HERO SECTION
+   -------------------------------------------------------------------------- */
+    .faq-hero {
+        position: relative;
+        padding: 12rem 0 8rem;
+        background: linear-gradient(rgba(2, 6, 23, 0.7), rgba(2, 6, 23, 0.5)),
+            url('https://images.unsplash.com/photo-1450101499163-c8848c66ca85?q=80&w=2000&auto=format&fit=crop');
+        background-attachment: fixed;
+        background-size: cover;
+        background-position: center;
+        text-align: center;
+        border-bottom: 1px solid var(--faq-border);
+    }
+
+    .faq-hero-pre {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.875rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.3em;
+        color: var(--faq-indigo);
+        margin-bottom: 1.5rem;
+        display: block;
+    }
+
+    .faq-hero-h1 {
+        font-family: 'Outfit', sans-serif;
+        font-size: clamp(3rem, 8vw, 5rem);
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        line-height: 0.95;
+        margin-bottom: 2rem;
+        background: linear-gradient(to bottom, #ffffff, #94a3b8);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .faq-hero-p {
+        font-family: 'Inter', sans-serif;
+        font-size: 1.25rem;
+        color: #94a3b8;
+        max-width: 600px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    /* --------------------------------------------------------------------------
+   CONTENT SECTIONS
+   -------------------------------------------------------------------------- */
+    .faq-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 2rem 2rem;
+    }
+
+    .faq-sec-header {
+        margin-bottom: 3rem;
+        border-bottom: 1px solid var(--faq-border);
+        padding-bottom: 1.5rem;
+    }
+
+    .faq-sec-title {
+        font-family: 'Outfit', sans-serif;
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #62ff00;
+        letter-spacing: -0.02em;
+    }
+
+    /* --------------------------------------------------------------------------
+   ACCORDION STYLING
+   -------------------------------------------------------------------------- */
+    .faq-group {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-bottom: 5rem;
+    }
+
+    .faq-item {
+        background: #585858;
+        border: 1px solid var(--faq-border);
+        border-radius: 1.66rem;
+        overflow: hidden;
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+   
+
+    .faq-trigger {
+        width: 100%;
+        padding: 1rem 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        text-align: left;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .faq-trigger-h3 {
+        font-family: 'Outfit', sans-serif;
+        font-size: 1.24rem;
+        font-weight: 600;
+        color: #ffffff;
+        line-height: 1.4;
+        padding-right: 2rem;
+        font-weight: 700;
+    }
+
+    .faq-icon {
+        width: 1.5rem;
+        height: 1.5rem;
+        color: rgba(255, 255, 255, 0.8);
+        transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        flex-shrink: 0;
+    }
+
+    .faq-item-open .faq-icon {
+        transform: rotate(180deg);
+    }
+
+    .faq-content {
+        padding: 0 2rem 2rem;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.891rem;
+        line-height: 1.8;
+        color: #ffffff;
+    }
+
+    /* --------------------------------------------------------------------------
+   GLOSSARY SECTION
+   -------------------------------------------------------------------------- */
+    .faq-glossary {
+        padding: 2rem 0;
+        background: #0f172a;
+        border-top: 1px solid var(--faq-border);
+    }
+
+    .faq-glo-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+    }
+
+    .faq-glo-card {
+        padding: 1rem;
+        background: #060b18;
+        border: 1px solid var(--faq-border);
+        border-radius: 1.5rem;
+        transition: all 0.4s ease;
+    }
+
+    .faq-glo-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--faq-indigo);
+        background: rgba(99, 102, 241, 0.03);
+    }
+
+    .faq-glo-term {
+        font-family: 'Outfit', sans-serif;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: orange;
+        margin-bottom: 1rem;
+        display: block;
+    }
+
+    .faq-glo-def {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.9375rem;
+        line-height: 1.6;
+        color: #94a3b8;
+    }
+
+
+    /* --------------------------------------------------------------------------
+   RESPONSIVE OVERRIDES
+   -------------------------------------------------------------------------- */
+    @media (max-width: 768px) {
+        .faq-hero {
+            padding: 8rem 2rem 5rem;
+        }
+
+        .faq-container {
+            padding: 4rem 1.5rem;
+        }
+
+        .faq-sec-header {
+            text-align: center;
+        }
+
+        .faq-sec-title {
+            font-size: 1.5rem;
+        }
+
+        .faq-trigger {
+            padding: 1.5rem;
+        }
+    }
+
+    .faq-no-pad { padding: 0 !important; }
+    .faq-text-center { text-align: center !important; }
+    .faq-title-force-lg { font-size: 2.5rem !important; }
+    .faq-bg-black-pill { background: #000000; padding: 0.25rem 0.5rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="faq-wrapper" x-data="{ activeItem: null }">
+
+    <!-- Hero Section -->
+    <section class="faq-hero">
+        <div class="faq-container faq-no-pad">
+            <span class="faq-hero-pre">Support & Documentation</span>
+            <h1 class="faq-hero-h1">Knowledge Hub</h1>
+            <p class="faq-hero-p">Answers to queries about DSTAIR and its development.</p>
+        </div>
+    </section>
+
+    <!-- FAQ Main Container -->
+    <div class="faq-container">
+
+        <!-- Category: General Queries -->
+        <div class="faq-sec-header">
+            <h2 class="faq-sec-title">General DSTAIR Queries</h2>
+        </div>
+        <div class="faq-group">
+            <!-- Q1 -->
+            <div class="faq-item" :class="{ 'faq-item-open': activeItem === 1 }">
+                <button class="faq-trigger" @click="activeItem = activeItem === 1 ? null : 1">
+                    <h3 class="faq-trigger-h3">What does DSTAIR actually mean?</h3>
+                    <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+                <div class="faq-content" x-show="activeItem === 1" x-collapse>
+                    Literally, DSTAIR stands for "a decision support tool to analyze institutional reform". The name of
+                    the tool refers to its intended use as a guide for reformers who wish to strengthen the institutions
+                    of governance and society in their country, knowing that some institutions lack the legitimacy
+                    required for those reforms to be effective. DSTAIR helps reformers to identify legitimate
+                    institutions through which positive developments in governance may be effected.
+                </div>
+            </div>
+
+            <!-- Q2 -->
+            <div class="faq-item" :class="{ 'faq-item-open': activeItem === 2 }">
+                <button class="faq-trigger" @click="activeItem = activeItem === 2 ? null : 2">
+                    <h3 class="faq-trigger-h3">Can I use DSTAIR?</h3>
+                    <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+                <div class="faq-content" x-show="activeItem === 2" x-collapse>
+                    Access to DSTAIR requires a Username and password, You can submit a request form to us in order to request access
+                    to the system in the <a href="/contact" class="text-indigo-400 hover:text-indigo-300" style="text-decoration: underline;color: #e27217;">contact</a> page.
+                </div>
+            </div>
+
+            <!-- Q3 -->
+            <div class="faq-item" :class="{ 'faq-item-open': activeItem === 3 }">
+                <button class="faq-trigger" @click="activeItem = activeItem === 3 ? null : 3">
+                    <h3 class="faq-trigger-h3">What should I do if I forget my username and password?</h3>
+                    <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+                <div class="faq-content" x-show="activeItem === 3" x-collapse>
+                    Simply email us at <a href="mailto:scrajan@smail.iitm.ac.in"
+                        class="text-indigo-400 hover:text-indigo-300">scrajan@smail.iitm.ac.in</a> for a reminder. We will try
+                    not to judge you.
+                </div>
+            </div>
+
+            
+
+           
+        </div>
+
+        <!-- Category: Questionnaire -->
+        <div class="faq-sec-header">
+            <h2 class="faq-sec-title">Completing the Questionnaire</h2>
+        </div>
+        <div class="faq-group">
+            <!-- Q6 -->
+            <div class="faq-item" :class="{ 'faq-item-open': activeItem === 6 }">
+                <button class="faq-trigger" @click="activeItem = activeItem === 6 ? null : 6">
+                    <h3 class="faq-trigger-h3">How do I get started?</h3>
+                    <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+                <div class="faq-content" x-show="activeItem === 6" x-collapse>
+                    After entering your username and password, you will be logged into the system. Click "Instructions"
+                    for detailed instructions on how to use the system. Note that you can begin the questionnaire at any
+                    time by selecting it from the tool menu on the left of the screen.
+                </div>
+            </div>
+
+            <!-- Q7 -->
+            <div class="faq-item" :class="{ 'faq-item-open': activeItem === 7 }">
+                <button class="faq-trigger" @click="activeItem = activeItem === 7 ? null : 7">
+                    <h3 class="faq-trigger-h3">How do I change the title for my analysis and display the country?</h3>
+                    <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+                <div class="faq-content" x-show="activeItem === 7" x-collapse>
+                    In the "Analysis Setup" page, you can change the title or country name on any analysis by clicking
+                    the title, country name or edit buttons. While the questionnaire does not change when the user
+                    changes the country of analysis, this information is still important in order for DSTAIR to compare
+                    results with other users for the same country.
+                </div>
+            </div>
+
+            <!-- Q8 -->
+            <div class="faq-item" :class="{ 'faq-item-open': activeItem === 8 }">
+                <button class="faq-trigger" @click="activeItem = activeItem === 8 ? null : 8">
+                    <h3 class="faq-trigger-h3">Can I analyze legitimacy across many countries?</h3>
+                    <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+                <div class="faq-content" x-show="activeItem === 8" x-collapse>
+                    Yes. You can add up to 9 new scenarios via the "Setup Analysis" page, selecting different countries
+                    and titles for each. In the Results page, all of your analyses are depicted, such that you can view
+                    the comparative legitimacy of certain spheres across each of these countries.
+                </div>
+            </div>
+
+            <!-- Q9 -->
+            <div class="faq-item" :class="{ 'faq-item-open': activeItem === 9 }">
+                <button class="faq-trigger" @click="activeItem = activeItem === 9 ? null : 9">
+                    <h3 class="faq-trigger-h3">What does the "Public" column indicate?</h3>
+                    <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+                <div class="faq-content" x-show="activeItem === 9" x-collapse>
+                    When an "N" is displayed, this indicates that you have not permitted the results of your analyses to
+                    be viewed by other users. A "Y" indicates that other users can access the results of your analyses
+                    for use in their reports. If you would like to change your privacy preference, please email us at <a
+                        href="mailto:crajan@tellus.org"
+                        class="text-indigo-400 hover:text-indigo-300">crajan@tellus.org</a>.
+                </div>
+            </div>
+
+            <!-- Q10 -->
+            <div class="faq-item" :class="{ 'faq-item-open': activeItem === 10 }">
+                <button class="faq-trigger" @click="activeItem = activeItem === 10 ? null : 10">
+                    <h3 class="faq-trigger-h3">How can I select another analysis?</h3>
+                    <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+                <div class="faq-content" x-show="activeItem === 10" x-collapse>
+                    A banner at the top of the questionnaire screen indicates which analysis you are currently updating.
+                    To update another analysis, select it from the drop-down menu in the "Questionnaire" box of the tool
+                    menu and click "Go" to execute the switch.
+                </div>
+            </div>
+
+            <!-- Q11 -->
+            <div class="faq-item" :class="{ 'faq-item-open': activeItem === 11 }">
+                <button class="faq-trigger" @click="activeItem = activeItem === 11 ? null : 11">
+                    <h3 class="faq-trigger-h3">How are my answers saved?</h3>
+                    <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+                <div class="faq-content" x-show="activeItem === 11" x-collapse>
+                    Answers are saved on a rolling basis, such that each time you change screens, all of your answers to
+                    that point will be changed. Clicking the "Save Changes" button at the top of the questionnaire page
+                    will also save answers; however, this is merely to reassure users and is not actually necessary to
+                    use.
+                </div>
+            </div>
+
+            <!-- Q12 -->
+            <div class="faq-item" :class="{ 'faq-item-open': activeItem === 12 }">
+                <button class="faq-trigger" @click="activeItem = activeItem === 12 ? null : 12">
+                    <h3 class="faq-trigger-h3">How does the rating system work?</h3>
+                    <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+                <div class="faq-content" x-show="activeItem === 12" x-collapse>
+                    Users assign ratings to questions on a 1-7 scale. A "1" rating is the minimum, while a "7" is a
+                    maximum. "N/A" denotes that the user has chosen not to answer this question for some reason; this
+                    question will not be considered when assessing the legitimacy of the sphere. Note that most users
+                    will score a "1" rather than "N/A" when considering omissions. For instance, if a country's
+                    Constitution omits the issue of minority rights entirely, a user will rate this question a "1"
+                    rather than "N/A", such that the legitimacy of the sphere will suffer because of this important
+                    omission.
+                </div>
+            </div>
+
+            <!-- Q13 -->
+            <div class="faq-item" :class="{ 'faq-item-open': activeItem === 13 }">
+                <button class="faq-trigger" @click="activeItem = activeItem === 13 ? null : 13">
+                    <h3 class="faq-trigger-h3">Does the order of addressing spheres matter?</h3>
+                    <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+                <div class="faq-content" x-show="activeItem === 13" x-collapse>
+                    No. DSTAIR was designed so that the user could tackle the questionnaire in any sequence, completing
+                    it at their own pace. Also, if the situation on the ground in a country changes, the user is free to
+                    return to the analysis and adjust their ratings accordingly.
+                </div>
+            </div>
+
+            <!-- Q14 -->
+            <div class="faq-item" :class="{ 'faq-item-open': activeItem === 14 }">
+                <button class="faq-trigger" @click="activeItem = activeItem === 14 ? null : 14">
+                    <h3 class="faq-trigger-h3">What do all of these icons mean?</h3>
+                    <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+                <div class="faq-content" x-show="activeItem === 14" x-collapse>
+                    Point to an icon with the cursor and leave it steady. A bubble will appear which explains what the
+                    icon denotes. The icons provide critical metadata:
+                    <ul class="mt-4 space-y-3 border-l-2 border-indigo-500/30 pl-4">
+                        <li><strong>Type:</strong> Informs whether a question pertains to meta-rules, rules, or
+                            exogenous factors.</li>
+                        <li><strong>Importance:</strong> Low, medium, or high importance assigned by developers.</li>
+                        <li><strong>Information:</strong> A popup help screen providing guidance and background for the
+                            rating.</li>
+                        <li><strong>Comments:</strong> A forum for communiques between users and developers regarding
+                            specific questions.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Category: Results & Tools -->
+        <div class="faq-sec-header">
+            <h2 class="faq-sec-title">Results & Tools</h2>
+        </div>
+        <div class="faq-group">
+            <!-- Q15 -->
+            <div class="faq-item" :class="{ 'faq-item-open': activeItem === 15 }">
+                <button class="faq-trigger" @click="activeItem = activeItem === 15 ? null : 15">
+                    <h3 class="faq-trigger-h3">What do these results mean?</h3>
+                    <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+                <div class="faq-content" x-show="activeItem === 15" x-collapse>
+                    The "Summary of Legitimacy Scores" presents ratings on a normalized 0-1 scale. The "Comparison of
+                    Legitimacy Scores with All Analyses" provides a summary for each analysis in your portfolio,
+                    allowing you to compare spheres across multiple countries.
+                </div>
+            </div>
+
+            <!-- Q16 -->
+            <div class="faq-item" :class="{ 'faq-item-open': activeItem === 16 }">
+                <button class="faq-trigger" @click="activeItem = activeItem === 16 ? null : 16">
+                    <h3 class="faq-trigger-h3">All tools have been triggered, what gives?</h3>
+                    <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+                <div class="faq-content" x-show="activeItem === 16" x-collapse>
+                    Either you have not answered any questions, or your answers have resulted in high legitimacy scores.
+                    Since N/A counts as meeting the minimum threshold, a blank questionnaire will trigger all tools.
+                    High scores also trigger tools as they suggest all DSTAIR specialized policies may be useful for
+                    lingering issues.
+                </div>
+            </div>
+        </div>
+
+        <!-- Category: Capabilities -->
+        <div class="faq-sec-header">
+            <h2 class="faq-sec-title">DSTAIR Capabilities</h2>
+        </div>
+        <div class="faq-group">
+            <!-- Q17 -->
+            <div class="faq-item" :class="{ 'faq-item-open': activeItem === 17 }">
+                <button class="faq-trigger" @click="activeItem = activeItem === 17 ? null : 17">
+                    <h3 class="faq-trigger-h3">Does DSTAIR calculate cross-sphere legitimacy effects?</h3>
+                    <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+                <div class="faq-content" x-show="activeItem === 17" x-collapse>
+                    At one time, DSTAIR allowed users to select an "attenuation factor". For simplicity, this advanced
+                    feature has been removed from the current version but may be reintroduced later for advanced
+                    analysts.
+                </div>
+            </div>
+
+            <!-- Q18 -->
+            <div class="faq-item" :class="{ 'faq-item-open': activeItem === 18 }">
+                <button class="faq-trigger" @click="activeItem = activeItem === 18 ? null : 18">
+                    <h3 class="faq-trigger-h3">Can I change the importance assigned to a question?</h3>
+                    <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+                <div class="faq-content" x-show="activeItem === 18" x-collapse>
+                    Not at this time. This feature was removed for the sake of simplicity in the current version, though
+                    it remains a planned future enhancement.
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Glossary Section -->
+    <section class="faq-glossary">
+        <div class="faq-container">
+            <div class="faq-sec-header faq-text-center">
+                <span class="faq-hero-pre">Terminology</span>
+                <h2 class="faq-sec-title faq-title-force-lg"> <span class="faq-bg-black-pill">Anti-Corruption Glossary</span></h2>
+            </div>
+
+            <div class="faq-glo-grid">
+                <!-- Term 1 -->
+                <div class="faq-glo-card">
+                    <span class="faq-glo-term">Institution</span>
+                    <p class="faq-glo-def">An established law, custom, usage, practice, organization or other element in
+                        the political or social life of the citizenry.</p>
+                </div>
+                <!-- Term 2 -->
+                <div class="faq-glo-card">
+                    <span class="faq-glo-term">Meta-rule</span>
+                    <p class="faq-glo-def">An institution which is necessary for the creation of a sphere of governance
+                        or society.</p>
+                </div>
+                <!-- Term 3 -->
+                <div class="faq-glo-card">
+                    <span class="faq-glo-term">Rule</span>
+                    <p class="faq-glo-def">An institution which contributes to the organization and operation of a
+                        sphere, often created by players within the sphere itself.</p>
+                </div>
+                <!-- Term 4 -->
+                <div class="faq-glo-card">
+                    <span class="faq-glo-term">Exogenous Factor</span>
+                    <p class="faq-glo-def">An outside force which affects an institution, though the institution has
+                        little or no control over its incidence (e.g., crime or natural disasters).</p>
+                </div>
+                <!-- Term 5 -->
+                <div class="faq-glo-card">
+                    <span class="faq-glo-term">Legitimacy Score</span>
+                    <p class="faq-glo-def">The extent to which institutions act within legal and social behavior bounds,
+                        in public perception and the eyes of the law. A measure of ability to contribute to
+                        anti-corruption campaigns.</p>
+                </div>
+                <!-- Term 6 -->
+                <div class="faq-glo-card">
+                    <span class="faq-glo-term">Attenuation</span>
+                    <p class="faq-glo-def">The effect of one institutional arrangement/sphere on others. For instance, a
+                        vague Constitution may reduce the effectiveness of investigative reporting regardless of actual
+                        skills.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+</div>
+{% endblock %}

@@ -1,0 +1,47 @@
+[
+    {
+        "order": 1,
+        "name": "CONSTITUTION",
+        "label": "Constitution"
+    },
+    {
+        "order": 2,
+        "name": "LEGISLATURE",
+        "label": "Legislature"
+    },
+    {
+        "order": 3,
+        "name": "EXECUTIVE",
+        "label": "Executive"
+    },
+    {
+        "order": 4,
+        "name": "PUBLIC ADMIN.",
+        "label": "Public Administration"
+    },
+    {
+        "order": 5,
+        "name": "COURTS",
+        "label": "Courts"
+    },
+    {
+        "order": 6,
+        "name": "POL. PARTIES",
+        "label": "Political Parties"
+    },
+    {
+        "order": 7,
+        "name": "CIVIL SOCIETY",
+        "label": "Civil Society"
+    },
+    {
+        "order": 8,
+        "name": "ECONOMY",
+        "label": "Economy"
+    },
+    {
+        "order": 9,
+        "name": "MEDIA",
+        "label": "Media"
+    }
+]

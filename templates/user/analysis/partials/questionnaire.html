@@ -1,0 +1,757 @@
+<!-- Questionnaire Tab Partial — AJAX-injected into #analysis-tab-content-container -->
+{% set qn_sphere_image_map = {
+    'CONSTITUTION':  'assets/how-it-work/sphersImage/constution.jpg',
+    'LEGISLATURE':   'assets/how-it-work/sphersImage/legislature.jpg',
+    'EXECUTIVE':     'assets/how-it-work/sphersImage/executive.jpg',
+    'PUBLIC ADMIN.': 'assets/how-it-work/sphersImage/publicAdministration.jpg',
+    'COURTS':        'assets/how-it-work/sphersImage/court.jpg',
+    'POL. PARTIES':  'assets/how-it-work/sphersImage/politicalParties.jpg',
+    'CIVIL SOCIETY': 'assets/how-it-work/sphersImage/civilSocity.jpg',
+    'ECONOMY':       'assets/how-it-work/sphersImage/economy.jpg',
+    'MEDIA':         'assets/how-it-work/sphersImage/media.jpg'
+} %}
+{% set qn_sphere_description_map = {
+    'CONSTITUTION':  'The basic laws and principles of the state, which determine the powers and duties of the government and its various branches and guarantee rights to people in it. Addresses the institutions that create, maintain and modify it.',
+    'LEGISLATURE':   'A branch of government whose persons have the authority to create laws for the state. Ideally elected by some consensual method, appropriately reflecting the citizenry and producing quality legislation subject to review by the Courts and the Executive.',
+    'EXECUTIVE':     'A branch of government, led by the head of state, charged with carrying out and enforcing the laws of the state, as well as diplomatic representation, commanding the armed forces, signing treaties and managing public administration.',
+    'PUBLIC ADMIN.': 'Entails all non-political public employees charged with delivering public services — including police, fire, rescue, unemployment insurance administration, national hospital systems, permit issuers, and tax collectors.',
+    'COURTS':        'The rules and practices responsible for delivering justice according to the Constitution and legislation. Addresses the legitimacy and impartiality of judges, juries, public defenders, and the overall fairness of the application of justice.',
+    'POL. PARTIES':  'A group of persons organised to promote and support certain principles and candidates for public office. Addresses financing of campaigns, influence of parties over the political system, and commitment to fair competition.',
+    'CIVIL SOCIETY': 'Non-governmental organisations and associations manifesting citizens\' interests. Measures the effectiveness of the citizenry in mobilizing and communicating its demands to the government between elections.',
+    'ECONOMY':       'The rules and practices relating to the system of production and distribution of goods and services in the country.',
+    'MEDIA':         'Outlets (newspapers, TV, etc.) on which the citizenry depends for accurate information. Addresses reliability, comprehensiveness, and independence.'
+} %}
+{% set qn_sphere_fallback_gradient_map = {
+    'CONSTITUTION':  'linear-gradient(145deg,#0F4C75 0%,#1B85B3 100%)',
+    'LEGISLATURE':   'linear-gradient(145deg,#1D4ED8 0%,#3B82F6 100%)',
+    'EXECUTIVE':     'linear-gradient(145deg,#7C3AED 0%,#A78BFA 100%)',
+    'PUBLIC ADMIN.': 'linear-gradient(145deg,#0369A1 0%,#06B6D4 100%)',
+    'COURTS':        'linear-gradient(145deg,#92400E 0%,#D97706 100%)',
+    'POL. PARTIES':  'linear-gradient(145deg,#9D174D 0%,#EC4899 100%)',
+    'CIVIL SOCIETY': 'linear-gradient(145deg,#065F46 0%,#059669 100%)',
+    'ECONOMY':       'linear-gradient(145deg,#7C2D12 0%,#F97316 100%)',
+    'MEDIA':         'linear-gradient(145deg,#374151 0%,#6B7280 100%)'
+} %}
+
+<style>
+    /* ============================================================
+    QUESTIONNAIRE TAB — all classes prefixed qn- to prevent
+    leakage into dashboard, results tab, or tools tab
+    ============================================================ */
+
+    .qn-tab-outer-workspace-layout {
+        display: flex;
+        min-height: calc(100vh - 137px);
+        background: #F3F4F6;
+    }
+
+    /* ── Left Sidebar ────────────────────────────────────────────── */
+    .qn-left-sphere-navigation-sidebar {
+        width: 300px;
+        flex-shrink: 0;
+        background: rgb(255, 255, 255);
+        border-right: none;
+        padding: 0;
+        overflow-y: auto;
+        position: sticky;
+        top: 140px;
+        max-height: calc(100vh - 137px);
+        display: flex;
+        flex-direction: column;
+                margin-right: 1rem;
+
+    }
+
+    /* Sidebar header block */
+    .qn-sidebar-header-block {
+        padding: 1.5rem 1.25rem 1rem;
+        border-bottom: 1px solid rgba(255,255,255,0.07);
+        flex-shrink: 0;
+    }
+    .qn-sidebar-spheres-section-heading {
+        font-size: 0.58rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.35);
+        letter-spacing: 0.18em;
+        margin-bottom: 0;
+    }
+    .qn-sidebar-header-title {
+        font-family: 'Outfit', sans-serif;
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: #fff;
+        letter-spacing: -0.02em;
+        margin-top: 0.2rem;
+        line-height: 1.2;
+    }
+
+    /* Nav list */
+    .qn-sidebar-nav-list {
+        padding: 0.75rem 0.875rem;
+        flex: 1;
+        overflow-y: auto;
+    }
+
+    .qn-sphere-nav-list-item {
+        padding: 0.5rem 0.875rem;
+        border-radius: 2.2rem;
+        margin-bottom: 0.4rem;
+        cursor: pointer;
+        transition: all 0.18s cubic-bezier(0.4,0,0.2,1);
+        border: 1px solid transparent;
+        position: relative;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.625rem;
+        background: #d6d6d6;
+        
+    }
+
+    .qn-sphere-nav-list-item.active {
+        background: rgb(227, 127, 26);
+        border-color: rgba(255,255,255,0.1);
+        box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+    }
+
+    /* Sphere order number in sidebar */
+    .qn-sidebar-item-index {
+        font-family: 'Outfit', sans-serif;
+        font-size: 0.9rem;
+        font-weight: 900;
+        color: rgb(0, 0, 0);
+        width: 18px;
+        flex-shrink: 0;
+        padding-top: 0.1rem;
+        font-variant-numeric: tabular-nums;
+        line-height: 1.3;
+    }
+    .qn-sphere-nav-list-item.active .qn-sidebar-item-index {
+        color: rgb(255, 255, 255);
+    }
+
+    .qn-sidebar-item-content { flex: 1; min-width: 0; }
+
+    .qn-sphere-nav-item-label-text {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: rgba(0, 0, 0, 0.75);
+        line-height: 1.3;
+    }
+    .qn-sphere-nav-list-item.active .qn-sphere-nav-item-label-text {
+        color: #ffffff;
+        font-weight: 800;
+    }
+
+    /* Score + progress row */
+    .qn-sidebar-item-score-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 0.3rem;
+        gap: 0.5rem;
+    }
+    .qn-sphere-nav-item-score-display {
+        font-size: 0.65rem;
+        color: rgb(73, 48, 10);
+        font-variant-numeric: tabular-nums;
+        font-weight: 600;
+    }
+    .qn-sphere-nav-list-item.active .qn-sphere-nav-item-score-display {
+        color: #ffffff;
+        font-weight: 700;
+    }
+
+    .qn-sphere-nav-item-progress-track {
+        flex: 1;
+        height: 3px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 9999px;
+        overflow: hidden;
+    }
+    .qn-sphere-nav-list-item.active .qn-sphere-nav-item-progress-track {
+        background: rgba(6,78,59,0.12);
+    }
+    .qn-sphere-nav-item-progress-fill {
+        height: 100%;
+        border-radius: 9999px;
+        background: linear-gradient(90deg, #34D399, #10B981);
+        transition: width 0.4s ease;
+        width: 0%;
+    }
+    .qn-sphere-nav-list-item.active .qn-sphere-nav-item-progress-fill {
+        background: linear-gradient(90deg, #064E3B, #059669);
+    }
+
+
+    /* ── Questions Column ────────────────────────────────────────── */
+    .qn-questions-scrollable-column {
+        flex: 1;
+        padding: 2rem 2rem;
+        min-width: 0;
+        background: rgba(0, 0, 0, 0.78);
+        
+    }
+
+    .qn-sphere-questions-section { display: none; }
+    .qn-sphere-questions-section.active { display: block; }
+
+    .qn-sphere-section-header-block {
+        margin-bottom: 1.75rem;
+        padding-bottom: 1.25rem;
+        border-bottom: 1px solid #727781;
+        
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 0.8rem;
+       
+    }
+    .qn-sphere-section-header-title-group {}
+    .qn-sphere-section-display-title {
+        font-family: 'Outfit', sans-serif;
+        font-size: 2.4rem;
+        font-weight: 800;
+        color: #10e878;
+        letter-spacing: -0.03em;
+        line-height: 1.15;
+        background-color: rgba(0, 0, 0, 0.98);
+        padding: 0.25rem 0.5rem;
+        border-radius: 8px;
+
+    }
+    .qn-sphere-section-description-subtext {
+        font-size: 0.84rem;
+        color: #6B7280;
+        margin-top: 0.35rem;
+        line-height: 1.55;
+    }
+    .qn-sphere-section-answered-count-chip {
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.35rem 0.875rem;
+        background: rgba(6,78,59,0.07);
+        border: 1px solid rgba(6,78,59,0.15);
+        border-radius: 9999px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: #065F46;
+        white-space: nowrap;
+        margin-top: 0.3rem;
+    }
+
+    /* ── Question Cards ──────────────────────────────────────────── */
+    .qn-individual-question-card {
+        background: #fff;
+        border: 1px solid #E5E7EB;
+        border-radius: 1rem;
+        margin-bottom: 0.875rem;
+        box-shadow: 0 1px 6px rgba(0,0,0,0.6);
+        transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+        overflow: hidden;
+        border-color: rgba(6,78,59,0.2);
+        box-shadow: 0 6px 24px rgba(0,0,0,0.07);
+        
+    }
+  
+        
+    }
+    .qn-individual-question-card:focus-within {
+        border-color: rgba(6,78,59,0.35);
+        box-shadow: 0 0 0 3px rgba(6,78,59,0.06), 0 4px 16px rgba(0,0,0,0.06);
+    }
+
+    /* Card top strip: number + type + importance + actions */
+    .qn-card-top-strip {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.7rem 1.25rem;
+        background: #455457;
+        border-bottom: 3.6px solid #dad322;
+        flex-wrap: wrap;
+    }
+    .qn-question-order-number-badge {
+        font-family: 'Outfit', sans-serif;
+        font-size: 0.72rem;
+        font-weight: 900;
+        color: #fff;
+        background: #064E3B;
+        border-radius: 0.35rem;
+        padding: 0.15rem 0.5rem;
+        letter-spacing: 0.02em;
+        font-variant-numeric: tabular-nums;
+        flex-shrink: 0;
+    }
+    .qn-question-type-chip {
+        font-size: 0.58rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        padding: 0.18rem 0.55rem;
+        border-radius: 0.3rem;
+        border: 1px solid;
+        flex-shrink: 0;
+    }
+    .qn-question-type-chip--rule     { background: #EFF6FF; color: #1D4ED8; border-color: #BFDBFE; }
+    .qn-question-type-chip--metarule { background: #F5F3FF; color: #6D28D9; border-color: #DDD6FE; }
+    .qn-question-type-chip--exogenous{ background: #FFF7ED; color: #C2410C; border-color: #FED7AA; }
+
+    /* Importance pips */
+    .qn-question-importance-dots-row {
+        display: flex;
+        align-items: center;
+        gap: 0.18rem;
+    }
+    .qn-importance-dot {
+        width: 6px; height: 6px;
+        border-radius: 50%;
+    }
+    .qn-importance-dot--filled { background: #F97316; }
+    .qn-importance-dot--empty  { background: #E5E7EB; }
+
+    /* Importance label */
+    .qn-importance-label {
+        font-size: 0.58rem;
+        font-weight: 700;
+        color: #9CA3AF;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-left: 0.15rem;
+    }
+
+    /* Action buttons pushed to the right */
+    .qn-question-utility-action-buttons {
+        display: flex;
+        gap: 0.3rem;
+        margin-left: auto;
+        flex-shrink: 0;
+    }
+    .qn-question-utility-action-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.28rem 0.65rem;
+        border-radius: 0.4rem;
+        border: 1px solid #E5E7EB;
+        background: #fff;
+        cursor: pointer;
+        font-size: 0.65rem;
+        font-weight: 700;
+        color: #6B7280;
+        transition: all 0.15s;
+        letter-spacing: 0.02em;
+        white-space: nowrap;
+        line-height: 1;
+    }
+    .qn-question-utility-action-btn svg { flex-shrink: 0; }
+    .qn-question-utility-action-btn:hover {
+        border-color: #9CA3AF;
+        color: #374151;
+        background: #F9FAFB;
+    }
+    .qn-question-utility-action-btn--notes {
+        color: #0369A1;
+        border-color: #BAE6FD;
+        background: #F0F9FF;
+    }
+    .qn-question-utility-action-btn--notes:hover {
+        background: #E0F2FE;
+        border-color: #7DD3FC;
+    }
+    .qn-question-utility-action-btn--ai {
+        color: #6D28D9;
+        border-color: #DDD6FE;
+        background: #F5F3FF;
+    }
+    .qn-question-utility-action-btn--ai:hover {
+        background: #EDE9FE;
+        border-color: #C4B5FD;
+        color: #5B21B6;
+    }
+
+    /* Question body */
+    .qn-card-body-section {
+        padding: 1.1rem 1.25rem 1rem;
+    }
+    .qn-question-body-text {
+        font-size: 0.92rem;
+        font-weight: 500;
+        color: #111827;
+        line-height: 1.7;
+    }
+
+    /* Rating section */
+    .qn-card-rating-section {
+        padding: 0.875rem 1.25rem 1.1rem;
+        background: #FAFAFA;
+        border-top: 1px solid #F3F4F6;
+    }
+    .qn-rating-scale-buttons-row {
+        display: flex;
+        gap: 0.25rem;
+        align-items: stretch;
+    }
+    .qn-rating-radio-hidden-input { display: none; }
+
+    /* OMIT button */
+    .qn-rating-omit-button-label {
+        flex: 0 0 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.5rem 0;
+        background: #F3F4F6;
+        border: 1px solid #E5E7EB;
+        border-radius: 0.4rem;
+        font-size: 0.58rem;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        cursor: pointer;
+        transition: all 0.15s;
+        user-select: none;
+        color: #9CA3AF;
+        text-transform: uppercase;
+    }
+    .qn-rating-omit-button-label:hover { background: #E5E7EB; color: #6B7280; }
+    .qn-rating-radio-hidden-input:checked + .qn-rating-omit-button-label {
+        background: #E5E7EB;
+        color: #374151;
+        border-color: #9CA3AF;
+    }
+
+    /* Scale 1-7 with semantic colors */
+    .qn-rating-scale-button-label {
+        flex: 1;
+        text-align: center;
+        padding: 0.55rem 0.1rem;
+        border: 1px solid #E5E7EB;
+        border-radius: 0.4rem;
+        font-size: 0.85rem;
+        font-weight: 800;
+        cursor: pointer;
+        transition: all 0.15s;
+        user-select: none;
+        color: #6B7280;
+        background: #fff;
+        line-height: 1;
+        font-variant-numeric: tabular-nums;
+    }
+    /* Hover tint based on value — set via inline style on each */
+    .qn-rating-scale-button-label:hover { filter: brightness(0.94); }
+
+    /* When checked — solid semantic color */
+    .qn-rating-radio-hidden-input:checked + .qn-rating-scale-button-label {
+        color: #fff !important;
+        border-color: transparent !important;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+        transform: translateY(-1px);
+    }
+
+    /* Scale endpoint labels */
+    .qn-rating-scale-endpoint-labels-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.35rem 0 0 52px;
+        font-size: 0.63rem;
+        font-weight: 600;
+        color: #9CA3AF;
+        letter-spacing: 0.04em;
+        
+    }
+
+    /* ── Right Context Panel ─────────────────────────────────────── */
+    .qn-right-sphere-context-panel {
+        width: 240px;
+        flex-shrink: 0;
+        background: #fff;
+        border-left: 1px solid #E5E7EB;
+        position: sticky;
+        top: 137px;
+        max-height: calc(100vh - 137px);
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Image block — taller, with overlaid sphere name */
+    .qn-context-panel-sphere-image-wrapper {
+        position: relative;
+        width: 100%;
+        height: 300px;
+        overflow: hidden;
+        background: #022C22;
+        flex-shrink: 0;
+    }
+    .qn-context-panel-sphere-actual-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: none;
+        transition: transform 0.6s ease;
+    }
+    .qn-right-sphere-context-panel:hover .qn-context-panel-sphere-actual-image {
+        transform: scale(1.03);
+    }
+    .qn-context-panel-sphere-fallback-gradient {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(145deg, #022C22 0%, #064E3B 60%, #059669 100%);
+    }
+    .qn-context-panel-sphere-fallback-monogram {
+        font-family: 'Outfit', sans-serif;
+        font-size: 7rem;
+        font-weight: 900;
+        color: rgba(255,255,255,0.12);
+        line-height: 1;
+        letter-spacing: -0.05em;
+        user-select: none;
+    }
+
+    /* Gradient overlay over image for text legibility */
+    .qn-context-panel-image-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, rgba(2,44,34,0.048) 0%, rgba(2,44,34,0.02) 55%, transparent 100%);
+        pointer-events: none;
+    }
+    /* Sphere name overlaid on image */
+    .qn-context-panel-image-title-block {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 1rem 1.25rem;
+    }
+    .qn-context-panel-currently-viewing-eyebrow {
+        font-size: 0.55rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: rgba(255,255,255,0.55);
+        margin-bottom: 0.2rem;
+    }
+    .qn-context-panel-sphere-display-name {
+        font-family: 'Outfit', sans-serif;
+        font-size: 1.5rem;
+        font-weight: 900;
+        color: #fff;
+        letter-spacing: -0.03em;
+        line-height: 1.15;
+        text-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        background-color: rgba(220, 142, 32, 0.98);
+        padding: 0.25rem 0.5rem;
+        border-radius: 8px;
+    }
+
+    /* Description section */
+    .qn-context-panel-sphere-meta-content {
+        padding: 1.1rem 1.25rem 0.75rem;
+        flex: 1;
+    }
+    .qn-context-panel-sphere-description-paragraph {
+        font-size: 0.85rem;
+        color: #4B5563;
+        line-height: 1.7;
+    }
+
+</style>
+
+<div class="qn-tab-outer-workspace-layout">
+
+    <!-- ── Left Sidebar ─────────────────────────────────────────── -->
+    <aside class="qn-left-sphere-navigation-sidebar">
+
+        <div class="qn-sidebar-nav-list">
+            {% for sphere in spheres %}
+            {% set qn_slug = sphere.name|replace(' ', '_')|replace('.', '') %}
+            <div class="qn-sphere-nav-list-item {% if loop.first %}active{% endif %}"
+                 data-sphere="{{ qn_slug }}"
+                 data-sphere-name="{{ sphere.name }}">
+                <div class="qn-sidebar-item-index"></div>
+                <div class="qn-sidebar-item-content">
+                    <div class="qn-sphere-nav-item-label-text">{{ sphere.label }}</div>
+                    <div class="qn-sidebar-item-score-row">
+                        <div class="qn-sphere-nav-item-score-display" id="qn-score-display-{{ qn_slug }}">—</div>
+                        <div class="qn-sphere-nav-item-progress-track">
+                            <div class="qn-sphere-nav-item-progress-fill" id="qn-progress-fill-{{ qn_slug }}"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+    </aside>
+
+    <!-- ── Questions Column ──────────────────────────────────────── -->
+    <main class="qn-questions-scrollable-column">
+        {% for sphere in spheres %}
+        {% set qn_slug = sphere.name|replace(' ', '_')|replace('.', '') %}
+        {% set qn_img_path = qn_sphere_image_map.get(sphere.name, 'assets/how-it-work/sphersImage/constution.jpg') %}
+        {% set qn_desc = qn_sphere_description_map.get(sphere.name, sphere.description or '') %}
+        {% set qn_fallback_gradient = qn_sphere_fallback_gradient_map.get(sphere.name, 'linear-gradient(145deg,#064E3B,#059669)') %}
+        <div id="sphere-{{ qn_slug }}"
+             class="qn-sphere-questions-section {% if loop.first %}active{% endif %}"
+             data-sphere-image="{{ url_for('static', filename=qn_img_path) }}"
+             data-sphere-label="{{ sphere.label }}"
+             data-sphere-desc="{{ qn_desc|e }}"
+             data-sphere-fallback-gradient="{{ qn_fallback_gradient }}"
+             data-sphere-initial="{{ sphere.label[0] }}">
+
+            <div class="qn-sphere-section-header-block">
+                <div class="qn-sphere-section-header-title-group">
+                    <div class="qn-sphere-section-display-title">{{ sphere.label }}</div>
+                </div>
+                
+            </div>
+
+            {% set qn_scale_colors = ['#DC2626','#EA580C','#D97706','#CA8A04','#65A30D','#16A34A','#15803D'] %}
+            {% for question in sphere.questions %}
+            {% set current_val = analysis.answers_dict.get(sphere.name, {}).get(question.id|string, '') %}
+            {% set qn_imp = question.importance or 1 %}
+            {% set qn_imp_label = 'High' if qn_imp == 3 else ('Medium' if qn_imp == 2 else 'Low') %}
+            <div class="qn-individual-question-card">
+
+                <!-- ── Top strip: number · type · importance · actions ── -->
+                <div class="qn-card-top-strip">
+                    <span class="qn-question-order-number-badge">Q{{ "%02d"|format(question.order) }}</span>
+
+                    {% if question.type == 'META-RULE' %}
+                    <span class="qn-question-type-chip qn-question-type-chip--metarule">Meta-Rule</span>
+                    {% elif question.type == 'EXOGENOUS' %}
+                    <span class="qn-question-type-chip qn-question-type-chip--exogenous">Exogenous</span>
+                    {% else %}
+                    <span class="qn-question-type-chip qn-question-type-chip--rule">Rule</span>
+                    {% endif %}
+
+                    <div class="qn-question-importance-dots-row" title="Importance: {{ qn_imp_label }}">
+                        {% for dot_i in range(1, 4) %}
+                        <div class="qn-importance-dot {% if dot_i <= qn_imp %}qn-importance-dot--filled{% else %}qn-importance-dot--empty{% endif %}"></div>
+                        {% endfor %}
+                        
+                    </div>
+
+                    <div class="qn-question-utility-action-buttons">
+                        <button class="qn-question-utility-action-btn"
+                                data-info-question="{{ question.id }}"
+                                data-help-info="{{ (question.help_info or '')|e }}"
+                                data-question-text="{{ question.content|e }}"
+                                title="More information">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                            
+                        </button>
+                        <button class="qn-question-utility-action-btn qn-question-utility-action-btn--notes"
+                                data-comment-question="{{ question.id }}"
+                                title="View and add notes">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                            
+                        </button>
+                        <button class="qn-question-utility-action-btn qn-question-utility-action-btn--ai"
+                                data-ai-context="{{ question.id }}"
+                                title="View AI analysis">
+                            
+                            AI
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ── Question body text ── -->
+                <div class="qn-card-body-section">
+                    <div class="qn-question-body-text">{{ question.content }}</div>
+                </div>
+
+                <!-- ── Rating scale ── -->
+                <div class="qn-card-rating-section">
+                    <form class="qn-question-rating-form"
+                          data-question="{{ question.id }}"
+                          data-sphere="{{ sphere.name }}"
+                          data-importance="{{ qn_imp }}">
+                        <div class="qn-rating-scale-buttons-row">
+                            <input type="radio" name="value" value="-1" id="qn-q{{ question.id }}-omit"
+                                   class="qn-rating-radio-hidden-input"
+                                   {% if current_val == '-1' or current_val == '' %}checked{% endif %}>
+                            <label for="qn-q{{ question.id }}-omit" class="qn-rating-omit-button-label">OMIT</label>
+
+                            {% for scale_i in range(1, 8) %}
+                            {% set qn_bg = qn_scale_colors[scale_i - 1] %}
+                            <input type="radio" name="value" value="{{ scale_i }}" id="qn-q{{ question.id }}-{{ scale_i }}"
+                                   class="qn-rating-radio-hidden-input"
+                                   {% if current_val == scale_i|string %}checked{% endif %}>
+                            <label for="qn-q{{ question.id }}-{{ scale_i }}"
+                                   class="qn-rating-scale-button-label"
+                                   style="background:{{ qn_bg }}1a;border-color:{{ qn_bg }}55;color:{{ qn_bg }};"
+                                   data-checked-bg="{{ qn_bg }}">{{ scale_i }}</label>
+                            {% endfor %}
+                        </div>
+                        <div class="qn-rating-scale-endpoint-labels-row">
+                            <span style="font-size: 0.6rem;color: #fff; background: rgb(222, 84, 49); padding: 0.25rem 0.5rem; border-radius: 8px;">{{ question.scale_min_label or 'Low' }}</span>
+                            <span style="font-size: 0.6rem; color: #fff; background: rgb(109, 208, 63); padding: 0.25rem 0.5rem; border-radius: 8px;">{{ question.scale_max_label or 'High' }}</span>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+    </main>
+
+    <!-- ── Right Context Panel ───────────────────────────────────── -->
+    <aside class="qn-right-sphere-context-panel" id="qn-right-sphere-context-panel">
+
+        <!-- Image + overlaid title -->
+        <div class="qn-context-panel-sphere-image-wrapper">
+            <img id="qn-context-panel-sphere-actual-image"
+                 class="qn-context-panel-sphere-actual-image"
+                 src="" alt=""
+                 onload="this.style.display='block'; document.getElementById('qn-context-panel-sphere-fallback-gradient-div').style.display='none';"
+                 onerror="this.style.display='none'; document.getElementById('qn-context-panel-sphere-fallback-gradient-div').style.display='flex';">
+            <div id="qn-context-panel-sphere-fallback-gradient-div"
+                 class="qn-context-panel-sphere-fallback-gradient">
+                <span id="qn-context-panel-sphere-fallback-monogram-letter"
+                      class="qn-context-panel-sphere-fallback-monogram">C</span>
+            </div>
+            <div class="qn-context-panel-image-overlay"></div>
+            
+        </div>
+
+        <!-- Description -->
+        <div class="qn-context-panel-sphere-meta-content">
+            <div class="qn-context-panel-sphere-description-paragraph" id="qn-context-panel-sphere-desc-text"></div>
+        </div>
+
+
+    </aside>
+
+</div>
+<script>
+(function(){
+    /* Apply semantic solid color to the checked scale button */
+    function qnApplyScaleColors(form) {
+        form.querySelectorAll('.qn-rating-scale-button-label').forEach(function(lbl) {
+            const bg = lbl.getAttribute('data-checked-bg');
+            if (!bg) return;
+            const inp = document.getElementById(lbl.getAttribute('for'));
+            if (inp && inp.checked) {
+                lbl.style.background = bg;
+                lbl.style.borderColor = bg;
+                lbl.style.color = '#fff';
+            } else {
+                lbl.style.background = bg + '1a';
+                lbl.style.borderColor = bg + '55';
+                lbl.style.color = bg;
+            }
+        });
+    }
+    document.querySelectorAll('.qn-question-rating-form').forEach(function(form) {
+        qnApplyScaleColors(form);
+        form.addEventListener('change', function(){ qnApplyScaleColors(form); });
+    });
+})();
+</script>

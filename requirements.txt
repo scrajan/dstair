@@ -1,0 +1,32 @@
+# ── Core Framework ──────────────────────────────────
+Flask>=3.0,<4.0
+Werkzeug>=3.0,<4.0
+
+# ── Database ────────────────────────────────────────
+Flask-SQLAlchemy>=3.1,<4.0
+Flask-Migrate>=4.0,<5.0
+
+# ── Authentication ──────────────────────────────────
+Flask-Login>=0.6,<1.0
+
+# ── Security ────────────────────────────────────────
+Flask-WTF>=1.2,<2.0
+Flask-Limiter>=3.5,<4.0
+bleach>=6.0,<7.0
+
+# ── Environment ─────────────────────────────────────
+python-dotenv>=1.0,<2.0
+
+# ── HTTP Client (AI Evaluator) ──────────────────────
+requests>=2.31,<3.0
+
+# ── Encryption (API Key At-Rest Encryption) ─────────
+cryptography>=42.0,<44.0
+Pillow>=10.0,<12.0
+
+# ── WSGI Servers (Production) ────────────────────────
+gunicorn>=22.0,<23.0
+waitress>=3.0,<4.0
+
+# ── Testing ──────────────────────────────────────────
+pytest>=8.0,<9.0

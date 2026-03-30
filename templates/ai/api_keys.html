@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+
+{% block title %}API Key Setup | DSTAIR{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/ai-user.css') }}">
+<!-- 
+  =============================================================================
+  AI API KEYS STYLES (.ai-key-*)
+  Strictly scoped to ai/api_keys.html ONLY. Zero inheritance.
+  =============================================================================
+-->
+
+{% endblock %}
+
+{% block content %}
+<section id="dstair-ai-api-keys" class="ai-key-page" x-data="apiKeyManager()">
+    <!-- Background -->
+    <div class="ai-key-bg">
+        <div class="ai-key-grid"></div>
+        <div class="ai-key-orb"></div>
+    </div>
+
+    <div class="ai-key-wrap">
+        <!-- Header -->
+        <div class="ai-key-head">
+            <div class="ai-key-badge">
+                <div class="ai-key-dot"></div>
+                <span class="ai-key-btxt">Configuration</span>
+            </div>
+            <h1 class="ai-key-h1">API Key Setup</h1>
+            <p class="ai-key-sub">
+                Configure API keys for AI providers. Your keys are stored securely and used for automated evaluations.
+            </p>
+        </div>
+
+        <!-- Provider Cards -->
+        <div class="ai-key-cards">
+            {% for provider_id, meta in providers.items() %}
+            {% set key_list = keys_by_provider.get(provider_id, []) %}
+            <div id="provider-{{ provider_id }}" class="ai-key-card {% if key_list %}ai-key-card--active{% endif %}"
+                x-data="{ editing: {% if not key_list %}true{% else %}false{% endif %}, newKey: '', editingKeyId: null }" data-provider="{{ provider_id }}">
+                
+                <div class="ai-key-chdr">
+                    <div class="ai-key-cinfo">
+                        <div class="ai-key-cicon">{{ meta.icon }}</div>
+                        <h2 class="ai-key-cname">{{ meta.label }}</h2>
+                    </div>
+                    {% if key_list|selectattr('is_active')|list %}
+                    <span class="ai-key-cstat ai-key-cstat--on">Active keys</span>
+                    {% elif key_list %}
+                    <span class="ai-key-cstat ai-key-cstat--off">All inactive</span>
+                    {% else %}
+                    <span class="ai-key-cstat ai-key-cstat--none">Not Set</span>
+                    {% endif %}
+                </div>
+
+                {% if key_list %}
+                <div class="ai-key-klist">
+                    {% for key in key_list %}
+                    <div class="ai-key-krow" data-key-id="{{ key.id }}">
+                        <div class="ai-key-mask">{{ key.masked_key }}</div>
+                        <div class="ai-key-acts">
+                            <button class="ai-key-btn" @click="toggleKey('{{ key.id }}')">{% if key.is_active %}Disable{% else %}Enable{% endif %}</button>
+                            <button class="ai-key-btn" @click="editing = true; newKey = ''; editingKeyId = '{{ key.id }}'">Edit</button>
+                            <button class="ai-key-btn" @click="reorderProviderKey('{{ provider_id }}', '{{ key.id }}', -1)">↑</button>
+                            <button class="ai-key-btn" @click="reorderProviderKey('{{ provider_id }}', '{{ key.id }}', 1)">↓</button>
+                            <button class="ai-key-btn ai-key-btn--del" @click="deleteKey('{{ key.id }}')">Delete</button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- Add another key button -->
+                <button x-show="!editing" class="ai-key-add" @click="editing = true; newKey = ''; editingKeyId = null">
+                    <span class="ai-key-addico">+</span>
+                    Add another {{ meta.label }} key
+                </button>
+                {% endif %}
+
+                <!-- Input Row (for new key or editing) -->
+                <div x-show="editing" class="ai-key-inp-row">
+                    <input type="password" class="ai-key-inp" x-model="newKey"
+                        placeholder="{{ meta.placeholder }}" @keydown.enter="saveKey('{{ provider_id }}', newKey)">
+                    <button class="ai-key-save" @click="saveKey('{{ provider_id }}', newKey, editingKeyId)">Save</button>
+                </div>
+
+                <div x-show="!editing" class="ai-key-bot">
+                    <a href="{{ meta.docs_url }}" target="_blank" class="ai-key-docs">Get your API key &rarr;</a>
+                </div>
+
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function apiKeyManager() {
+        return {
+            async saveKey(provider, key, keyId = null) {
+                if (!key.trim()) {
+                    if(typeof showToast === 'function') showToast('Please enter an API key.', 'error');
+                    else alert('Please enter an API key.');
+                    return;
+                }
+                try {
+                    const payload = { provider, api_key: key.trim() };
+                    if (keyId) {
+                        payload.key_id = keyId;
+                    }
+                    const res = await fetch('{{ url_for("ai_dashboard.save_api_key") }}', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() },
+                        body: JSON.stringify(payload)
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        if(typeof showToast === 'function') showToast(data.message, 'success');
+                        setTimeout(() => location.reload(), 800);
+                    } else {
+                        if(typeof showToast === 'function') showToast(data.error, 'error');
+                    }
+                } catch (e) {
+                    if(typeof showToast === 'function') showToast('Network error.', 'error');
+                }
+            },
+            async toggleKey(keyId) {
+                try {
+                    const res = await fetch(`/ai/api-keys/${keyId}/toggle`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() },
+                        body: JSON.stringify({})
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        if(typeof showToast === 'function') showToast(`Key ${data.is_active ? 'enabled' : 'disabled'}.`, 'success');
+                        setTimeout(() => location.reload(), 800);
+                    } else {
+                        if(typeof showToast === 'function') showToast(data.error, 'error');
+                    }
+                } catch (e) {
+                    if(typeof showToast === 'function') showToast('Network error.', 'error');
+                }
+            },
+            async deleteKey(keyId) {
+                if (!confirm('Delete this API key?')) return;
+                try {
+                    const res = await fetch(`/ai/api-keys/${keyId}/delete`, {
+                        method: 'DELETE',
+                        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() },
+                        body: JSON.stringify({})
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        if(typeof showToast === 'function') showToast(data.message, 'success');
+                        setTimeout(() => location.reload(), 800);
+                    } else {
+                        if(typeof showToast === 'function') showToast(data.error, 'error');
+                    }
+                } catch (e) {
+                    if(typeof showToast === 'function') showToast('Network error.', 'error');
+                }
+            },
+
+            async reorderProviderKey(provider, keyId, direction) {
+                const container = document.querySelector(`#provider-${provider}`);
+                if (!container) return;
+
+                const keys = Array.from(container.querySelectorAll('.ai-key-krow')).map(el => el.dataset.keyId);
+                const currentIndex = keys.indexOf(keyId.toString());
+                if (currentIndex === -1) return;
+
+                const targetIndex = currentIndex + direction;
+                if (targetIndex < 0 || targetIndex >= keys.length) return;
+
+                const reordered = [...keys];
+                [reordered[currentIndex], reordered[targetIndex]] = [reordered[targetIndex], reordered[currentIndex]];
+
+                try {
+                    const res = await fetch('{{ url_for("ai_dashboard.reorder_api_keys") }}', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() },
+                        body: JSON.stringify({ order: reordered })
+                    });
+                    const data = await res.json();
+                    if (data.success) {
+                        if(typeof showToast === 'function') showToast(data.message, 'success');
+                        setTimeout(() => location.reload(), 300);
+                    } else {
+                        if(typeof showToast === 'function') showToast(data.error, 'error');
+                    }
+                } catch (e) {
+                    if(typeof showToast === 'function') showToast('Network error.', 'error');
+                }
+            }
+        };
+    }
+</script>
+{% endblock %}

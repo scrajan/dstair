@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block title %}System Maintenance - DSTAIR{% endblock %}
+
+{% block extra_css %}
+<!-- ── MAINTENANCE PAGE STYLES ─────────────────────────────────────────── -->
+<!-- Completely isolated CSS namespace (.mnt-*) to prevent global inheritance
+     per project guidelines. -->
+<style>
+    /* Base Container */
+    .mnt-page {
+        min-height: 70vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        font-family: 'Inter', sans-serif;
+    }
+
+    /* Wrap Content */
+    .mnt-wrap {
+        max-width: 42rem;
+        width: 100%;
+        text-align: center;
+    }
+
+    /* Fade In Animation */
+    @keyframes mnt-fade {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .mnt-animate {
+        animation: mnt-fade 0.8s ease-out forwards;
+    }
+
+    /* Icon Container with Glow Effect */
+    .mnt-icon-container {
+        position: relative;
+        display: inline-block;
+        margin-bottom: 2rem;
+    }
+    .mnt-icon-glow {
+        position: absolute;
+        inset: 0;
+        background: rgba(59, 130, 246, 0.2);
+        filter: blur(24px);
+        border-radius: 50%;
+        pointer-events: none;
+    }
+    .mnt-icon-box {
+        position: relative;
+        background: #0f172a;
+        border: 1px solid #1e293b;
+        padding: 1.5rem;
+        border-radius: 1.5rem;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+    .mnt-icon {
+        width: 5rem;
+        height: 5rem;
+        color: #3b82f6;
+    }
+
+    /* Typography */
+    .mnt-text-group { margin-bottom: 2rem; }
+    .mnt-title {
+        font-size: clamp(2.25rem, 5vw, 3rem);
+        font-family: 'Outfit', serif;
+        font-weight: 800;
+        letter-spacing: -0.025em;
+        color: #ffffff;
+        margin: 0 0 1rem;
+        line-height: 1.1;
+    }
+    .mnt-title span { color: #3b82f6; }
+    .mnt-subtitle {
+        font-size: 1.125rem;
+        color: #94a3b8;
+        max-width: 32rem;
+        margin: 0 auto;
+        line-height: 1.625;
+        font-weight: 300;
+    }
+
+    /* Admin Action Box */
+    .mnt-admin-box {
+        background: rgba(15, 23, 42, 0.5);
+        border: 1px solid #1e293b;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        backdrop-filter: blur(4px);
+        max-width: 28rem;
+        margin: 0 auto 1rem;
+    }
+    .mnt-admin-header {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #cbd5e1;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin: 0 0 1rem;
+    }
+    .mnt-admin-content { text-align: left; }
+    .mnt-admin-text { font-size: 0.875rem; color: #94a3b8; margin: 0 0 0.75rem; }
+    .mnt-admin-code {
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 0.5rem;
+        padding: 0.75rem;
+        font-family: monospace;
+        font-size: 0.75rem;
+        color: #60a5fa;
+        border: 1px solid rgba(51, 65, 85, 0.5);
+        overflow-x: auto;
+        margin-bottom: 0.75rem;
+    }
+    .mnt-admin-footer { font-size: 0.75rem; color: #64748b; font-style: italic; margin: 0; }
+
+    /* Footer Navigation */
+    .mnt-footer { padding-top: 1rem; }
+    .mnt-link {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #64748b;
+        text-decoration: none;
+        transition: color 0.2s;
+    }
+    .mnt-link:hover { color: #ffffff; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mnt-page">
+    <div class="mnt-wrap mnt-animate">
+        
+        <!-- Icon Container -->
+        <div class="mnt-icon-container">
+            <div class="mnt-icon-glow"></div>
+            <div class="mnt-icon-box">
+                <svg class="mnt-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+            </div>
+        </div>
+
+        <!-- Text Content -->
+        <div class="mnt-text-group">
+            <h1 class="mnt-title">System <span>Initialization</span> Required</h1>
+            <p class="mnt-subtitle">
+                The DSTAIR analytical engine is currently offline. The core database has not been initialized or is currently unreachable.
+            </p>
+        </div>
+
+        <!-- Administrative Action Box -->
+        <div class="mnt-admin-box">
+            <h3 class="mnt-admin-header">Administrator Instructions</h3>
+            <div class="mnt-admin-content">
+                <p class="mnt-admin-text">To restore service, please execute the strategic seeding command from the application terminal:</p>
+                <div class="mnt-admin-code">flask seed-db</div>
+                <p class="mnt-admin-footer">This will rebuild the schema and ingest all institutional parameters, questions, and baseline users.</p>
+            </div>
+        </div>
+
+        <!-- Footer link -->
+        <div class="mnt-footer">
+            <a href="/" class="mnt-link">&larr; Return to gateway</a>
+        </div>
+        
+    </div>
+</div>
+{% endblock %}

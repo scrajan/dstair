@@ -1,0 +1,53 @@
+# ── Environment & Secrets ───────────────────────────
+.env
+.env.local
+.env.*.local
+
+# ── Python ──────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+
+# ── Virtual Environment ─────────────────────────────
+venv/
+env/
+ENV/
+.venv/
+
+# ── Flask / SQLite ──────────────────────────────────
+instance/
+*.db
+*.sqlite3
+static/uploads/
+.pytest_cache_local/
+.tmp_pytest_tmp/
+tests_runtime/
+
+# ── Migrations (keep structure, ignore bytecode) ────
+migrations/versions/__pycache__/
+
+# ── IDE ─────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.settings/
+
+# ── OS ──────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Logs ────────────────────────────────────────────
+*.log
+
+# ── Temp debug files ────────────────────────────────
+temp_*.py

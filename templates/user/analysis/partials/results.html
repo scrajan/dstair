@@ -1,0 +1,801 @@
+<!-- Results Tab Partial — AJAX-injected into #analysis-tab-content-container -->
+<style>
+/* ============================================================
+   RESULTS TAB — all classes prefixed rs- to prevent leakage
+   ============================================================ */
+
+/* ── Workspace ────────────────────────────────────────────────── */
+.rs-results-two-column-workspace {
+    display: flex;
+    align-items: flex-start;
+    min-height: calc(100vh - 137px);
+    background: #F3F4F6;
+}
+
+.rs-results-main-left-column {
+    flex: 1;
+    min-width: 0;
+    padding: 2rem 2rem 3rem 2.5rem;
+}
+
+/* ── Aggregate Hero Banner ────────────────────────────────────── */
+.rs-aggregate-hero-banner {
+    background: #373837;
+    border-radius: 2.5rem;
+    padding: 2rem 2.5rem;
+    margin-bottom: 1.75rem;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    position: relative;
+    overflow: hidden;
+}
+.rs-aggregate-hero-banner::before {
+    content: '';
+    position: absolute;
+    right: -60px; top: -60px;
+    width: 220px; height: 220px;
+    border-radius: 50%;
+    background: rgba(249,115,22,0.08);
+    pointer-events: none;
+}
+.rs-aggregate-hero-banner::after {
+    content: '';
+    position: absolute;
+    right: 40px; bottom: -80px;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: rgba(5,150,105,0.07);
+    pointer-events: none;
+}
+.rs-aggregate-hero-score-block {
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+}
+.rs-aggregate-hero-score-eyebrow {
+    font-size: 0.58rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 0.35rem;
+}
+.rs-aggregate-hero-score-number {
+    font-family: 'Outfit', sans-serif;
+    font-size: 4rem;
+    font-weight: 900;
+    letter-spacing: -0.05em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    color: #F97316;
+}
+.rs-aggregate-hero-score-suffix {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: rgba(249,115,22,0.5);
+    vertical-align: super;
+}
+.rs-aggregate-hero-divider {
+    width: 1px;
+    height: 64px;
+    background: rgba(255,255,255,0.1);
+    flex-shrink: 0;
+}
+.rs-aggregate-hero-meta-block {
+    flex: 1;
+    position: relative;
+    z-index: 1;
+}
+.rs-aggregate-hero-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.35rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.rs-aggregate-hero-subtitle {
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.45);
+    line-height: 1.6;
+    max-width: 380px;
+}
+.rs-aggregate-hero-stats-row {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1rem;
+    flex-wrap: wrap;
+}
+.rs-aggregate-hero-stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+.rs-aggregate-hero-stat-value {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+}
+.rs-aggregate-hero-stat-label {
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: rgba(255,255,255,0.35);
+}
+
+/* Score colour band at the top of banner */
+.rs-aggregate-hero-color-band {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    border-radius: 1.25rem 1.25rem 0 0;
+    background: linear-gradient(90deg, #F97316, #FBBF24);
+}
+
+/* ── Score Legend Strip ───────────────────────────────────────── */
+.rs-score-legend-strip {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    padding: 0.6rem 1rem;
+    background: #fff;
+    border: 1px solid #E5E7EB;
+    border-radius: 0.625rem;
+    flex-wrap: wrap;
+}
+.rs-score-legend-label {
+    font-size: 0.6rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #9CA3AF;
+    margin-right: 0.25rem;
+}
+.rs-score-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: #374151;
+    white-space: nowrap;
+}
+.rs-score-legend-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+/* ── Sphere Breakdown Panel ───────────────────────────────────── */
+.rs-sphere-breakdown-panel {
+    background: #fff;
+    border: 1px solid #E5E7EB;
+    border-radius: 1.125rem;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.rs-sphere-breakdown-panel-header {
+    padding: 1.1rem 1.75rem;
+    border-bottom: 1px solid #040d21;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #03080e;
+}
+.rs-sphere-breakdown-panel-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #cef4eb;
+    letter-spacing: -0.02em;
+}
+.rs-sphere-breakdown-panel-subtitle {
+    font-size: 0.68rem;
+    color: #9CA3AF;
+    font-weight: 500;
+}
+
+/* Sphere rows */
+.rs-sphere-breakdown-data-row {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.75rem;
+    border-bottom: 1px solid #F9FAFB;
+    gap: 1.25rem;
+    transition: background 0.15s;
+}
+.rs-sphere-breakdown-data-row:last-child { border-bottom: none; }
+.rs-sphere-breakdown-data-row:hover { background: #FAFAFA; }
+
+.rs-sphere-breakdown-sphere-name {
+    width: 160px;
+    flex-shrink: 0;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #111827;
+    letter-spacing: -0.01em;
+}
+.rs-sphere-breakdown-bar-and-meta {
+    flex: 1;
+    min-width: 0;
+}
+.rs-sphere-breakdown-progress-bar-track {
+    height: 8px;
+    background: #F3F4F6;
+    border-radius: 9999px;
+    overflow: hidden;
+    margin-bottom: 0.4rem;
+}
+.rs-sphere-breakdown-progress-bar-fill {
+    height: 100%;
+    border-radius: 9999px;
+    transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
+    width: 0%;
+}
+.rs-sphere-breakdown-completion-text {
+    font-size: 0.72rem;
+    color: #9CA3AF;
+    font-weight: 500;
+}
+
+.rs-sphere-breakdown-score-block {
+    flex-shrink: 0;
+    text-align: right;
+    min-width: 72px;
+}
+.rs-sphere-breakdown-score-number {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.375rem;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    color: #D1D5DB;
+}
+.rs-sphere-breakdown-score-label {
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #D1D5DB;
+    margin-top: 0.2rem;
+}
+
+/* ── Right Panel ──────────────────────────────────────────────── */
+.rs-results-right-chart-panel {
+    width: 660px;
+    flex-shrink: 0;
+    background: #465457;
+    border-left: none;
+    position: sticky;
+    top: 137px;
+    max-height: calc(100vh - 137px);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Country hero */
+.rs-country-hero-image-block {
+    position: relative;
+    height: 420px;
+    background: #064E3B;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+.rs-country-hero-image-block > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.rs-country-hero-image-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(2,44,34,0.0095) 0%, rgba(2,44,34,0.0003) 55%, transparent 100%);
+}
+.rs-country-hero-no-image-monogram {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Outfit', sans-serif;
+    font-size: 5rem;
+    font-weight: 900;
+    color: rgba(255,255,255,0.1);
+    letter-spacing: -0.05em;
+}
+.rs-country-hero-identity-row {
+    position: absolute;
+    bottom: 1rem;
+    left: 1.25rem;
+    right: 1.25rem;
+}
+.rs-country-hero-eyebrow {
+    font-size: 0.55rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: rgba(255,255,255,0.45);
+    margin-bottom: 0.25rem;
+}
+.rs-country-hero-name-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.rs-country-hero-flag-image {
+    width: 24px;
+    height: 16px;
+    object-fit: cover;
+    border-radius: 2px;
+    flex-shrink: 0;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+}
+.rs-country-hero-name-text {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: -0.03em;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    line-height: 1.15;
+}
+
+/* Panel score summary (inside dark panel) */
+.rs-panel-score-summary {
+    padding: 1.25rem 1.25rem 0;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+.rs-panel-score-summary-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+.rs-panel-score-summary-value {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: -0.04em;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+}
+.rs-panel-score-summary-value--orange { color: #F97316; }
+.rs-panel-score-summary-label {
+    font-size: 0.58rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: rgba(255,255,255,0.35);
+}
+.rs-panel-score-divider {
+    width: 1px;
+    height: 36px;
+    background: rgba(255,255,255,0.1);
+    flex-shrink: 0;
+}
+
+/* Radar chart section */
+.rs-panel-chart-section {
+    padding: 1.25rem;
+    flex-shrink: 0;
+}
+.rs-panel-section-eyebrow {
+    font-size: 0.55rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: rgba(255,255,255,0.3);
+    margin-bottom: 0.75rem;
+}
+.rs-chart-panel-radar-canvas-wrapper {
+    width: 100%;
+    position: relative;
+}
+canvas#rsRadarChart { width: 100% !important; height: auto !important; }
+
+/* Legend */
+.rs-panel-legend-section {
+    padding: 0 1.25rem 1.25rem;
+    flex: 1;
+}
+.rs-panel-legend-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+.rs-chart-panel-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 0.75rem;
+    background: rgba(255,255,255,0.04);
+    border: 3.2px solid rgba(255,255,255,0.7);
+    border-radius: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.9);
+}
+.rs-chart-panel-legend-color-swatch {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.rs-panel-no-comparison-note {
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.25);
+    text-align: center;
+    padding: 1rem 0;
+    line-height: 1.7;
+}
+
+/* ==========================================================================
+   MOBILE RESPONSIVE — Results Tab
+   Only additive @media blocks. No existing rules touched.
+   ========================================================================== */
+@media (max-width: 768px) {
+    /* Stack layout: main left col takes full width, right panel hidden */
+    .rs-results-two-column-workspace {
+        flex-direction: column;
+    }
+
+    .rs-results-main-left-column {
+        padding: 1.25rem 1rem 2rem;
+        width: 100%;
+    }
+
+    /* Hide the decorative right chart/image panel on mobile */
+    .rs-results-right-chart-panel {
+        display: none;
+    }
+
+    /* Aggregate hero: stack score above meta */
+    .rs-aggregate-hero-banner {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1.5rem;
+        border-radius: 1.5rem;
+    }
+
+    .rs-aggregate-hero-divider {
+        display: none;
+    }
+
+    .rs-aggregate-hero-score-number {
+        font-size: 3rem;
+    }
+
+    .rs-aggregate-hero-title {
+        font-size: 1.5rem;
+    }
+
+    /* Sphere rows: reduce sphere name width */
+    .rs-sphere-breakdown-sphere-name {
+        width: 120px;
+        font-size: 0.78rem;
+    }
+
+    .rs-sphere-breakdown-data-row {
+        padding: 0.875rem 1rem;
+        gap: 0.75rem;
+    }
+
+    .rs-sphere-breakdown-panel-header {
+        padding: 0.875rem 1rem;
+    }
+
+    .rs-sphere-breakdown-panel-title {
+        font-size: 1.25rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .rs-aggregate-hero-score-number {
+        font-size: 2.5rem;
+    }
+
+    .rs-sphere-breakdown-sphere-name {
+        width: 90px;
+        font-size: 0.72rem;
+    }
+}
+</style>
+
+{% set rs_country = analysis.country_obj %}
+{% set rs_hero_url = rs_country.hero_image_static_url if rs_country else None %}
+{% set rs_cobj = rs_country %}
+
+<div class="rs-results-two-column-workspace">
+
+    <!-- ── Left column ────────────────────────────────────────────── -->
+    <div class="rs-results-main-left-column">
+
+        <!-- Aggregate hero banner -->
+        <div class="rs-aggregate-hero-banner">
+            <div class="rs-aggregate-hero-color-band"></div>
+            <div class="rs-aggregate-hero-score-block">
+                <div class="rs-aggregate-hero-score-eyebrow">Aggregate Index</div>
+                <div class="rs-aggregate-hero-score-number" id="rs-aggregate-index-value-display">
+                    —<span class="rs-aggregate-hero-score-suffix"></span>
+                </div>
+            </div>
+            <div class="rs-aggregate-hero-divider"></div>
+            <div class="rs-aggregate-hero-meta-block">
+                <div class="rs-aggregate-hero-title">
+                    {% if rs_cobj and rs_cobj.iso2_code %}
+                    <img src="https://flagcdn.com/w40/{{ rs_cobj.iso2_code.lower() }}.png"
+                         alt="{{ analysis.country }}"
+                         style="width:50px;height:auto;object-fit:cover;border-radius:3px;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,0.9);">
+                    {% endif %}
+                    {{ analysis.country }}
+                </div>
+                
+            </div>
+        </div>
+
+        <!-- Score legend -->
+        <div class="rs-score-legend-strip">
+            <span class="rs-score-legend-label">Score key</span>
+            <span class="rs-score-legend-item">
+                <span class="rs-score-legend-dot" style="background:#16A34A;"></span>Strong ≥ 0.70
+            </span>
+            <span class="rs-score-legend-item">
+                <span class="rs-score-legend-dot" style="background:#D97706;"></span>Moderate ≥ 0.40
+            </span>
+            <span class="rs-score-legend-item">
+                <span class="rs-score-legend-dot" style="background:#DC2626;"></span>Weak &lt; 0.40
+            </span>
+            <span class="rs-score-legend-item" style="margin-left:auto;color:#9CA3AF;">
+                Legitimacy Score 0 – 1
+            </span>
+        </div>
+
+        <!-- Sphere breakdown -->
+        <div class="rs-sphere-breakdown-panel">
+            <div class="rs-sphere-breakdown-panel-header">
+                <div class="rs-sphere-breakdown-panel-title">Sphere Breakdown</div>
+                <div class="rs-sphere-breakdown-panel-subtitle">Per-sphere weighted score</div>
+            </div>
+            {% for sphere in spheres %}
+            {% set sphere_answers = analysis.answers_dict.get(sphere.name, {}) %}
+            {% set answered = sphere_answers.values() | reject("equalto", "-1") | list | length %}
+            {% set total = sphere.questions | length %}
+            <div class="rs-sphere-breakdown-data-row">
+                <div class="rs-sphere-breakdown-sphere-name">{{ sphere.label }}</div>
+                <div class="rs-sphere-breakdown-bar-and-meta">
+                    <div class="rs-sphere-breakdown-progress-bar-track">
+                        <div class="rs-sphere-breakdown-progress-bar-fill"
+                             id="rs-sphere-bar-fill-{{ loop.index }}"></div>
+                    </div>
+                    <div class="rs-sphere-breakdown-completion-text">
+                        {{ answered }} of {{ total }} questions answered
+                    </div>
+                </div>
+                <div class="rs-sphere-breakdown-score-block">
+                    <div class="rs-sphere-breakdown-score-number"
+                         id="rs-sphere-score-number-{{ loop.index }}">—</div>
+                    <div class="rs-sphere-breakdown-score-label"
+                         id="rs-sphere-score-label-{{ loop.index }}">Score</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+    </div>
+
+    <!-- ── Right panel ────────────────────────────────────────────── -->
+    <aside class="rs-results-right-chart-panel">
+
+        <!-- Country hero -->
+        <div class="rs-country-hero-image-block">
+            {% if rs_hero_url %}
+            <img src="{{ rs_hero_url }}" alt="{{ analysis.country }}"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+            <div class="rs-country-hero-no-image-monogram" style="display:none;position:absolute;inset:0;">
+                {{ analysis.country[0] | upper }}
+            </div>
+            {% else %}
+            <div class="rs-country-hero-no-image-monogram">{{ analysis.country[0] | upper }}</div>
+            {% endif %}
+            <div class="rs-country-hero-image-overlay"></div>
+            <div class="rs-country-hero-identity-row">
+                
+                
+            </div>
+        </div>
+
+        
+
+        <!-- Radar chart -->
+        <div class="rs-panel-chart-section">
+            
+            <div class="rs-chart-panel-radar-canvas-wrapper">
+                <canvas id="rsRadarChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Legend -->
+        <div class="rs-panel-legend-section">
+            <div class="rs-panel-section-eyebrow">Series</div>
+            <div class="rs-panel-legend-list" id="rs-chart-panel-legend-list"></div>
+            {% if radar_analyses | length <= 1 %}
+            <div class="rs-panel-no-comparison-note">
+                No comparison data available for <strong style="color:rgba(255,255,255,0.5)">{{ analysis.country }}</strong> yet. Complete more analyses or enable AI baseline.
+            </div>
+            {% endif %}
+        </div>
+
+    </aside>
+
+</div>
+
+<!-- Chart.js -->
+<script>
+(function () {
+    function rsInitChart() {
+    const RS_SERIES_COLORS = ['#F97316','#34D399','#60A5FA','#A78BFA','#FB7185','#FBBF24'];
+
+    const rsRadarAnalyses = {{ radar_series | tojson }};
+    const rsSpheres       = {{ sphere_labels | tojson }};
+
+    const rsImportanceMap = {
+        {% for sphere in spheres %}{% for q in sphere.questions %}"{{ q.id }}": {{ q.importance or 1 }},{% endfor %}{% endfor %}
+    };
+
+    function rsScoreColor(s)    { return s >= 0.7 ? '#16A34A' : s >= 0.4 ? '#D97706' : '#DC2626'; }
+    function rsScoreGradient(s) {
+        return s >= 0.7 ? 'linear-gradient(90deg,#064E3B,#16A34A)'
+             : s >= 0.4 ? 'linear-gradient(90deg,#92400E,#D97706)'
+             :             'linear-gradient(90deg,#991B1B,#DC2626)';
+    }
+
+    function rsComputeSphereScores(answersDict) {
+        return rsSpheres.map(sphere => {
+            const sa = (answersDict || {})[sphere.name] || {};
+            let num = 0, den = 0;
+            for (const [qid, val] of Object.entries(sa)) {
+                if (val === '-1' || val === null || val === undefined) continue;
+                const r = Number(val); if (isNaN(r)) continue;
+                const a = rsImportanceMap[String(qid)] || 1;
+                num += a * r; den += a * 7;
+            }
+            return den > 0 ? parseFloat((num / den).toFixed(2)) : 0;
+        });
+    }
+
+    // ── Current analysis scores ────────────────────────────────────
+    const rsCurrentAnswers = rsRadarAnalyses[0]
+        ? (rsRadarAnalyses[0].answers_dict || rsRadarAnalyses[0].answers || {}) : {};
+
+    const rsSphereIj = [];
+    let rsTotalAnswered = 0;
+
+    rsSpheres.forEach((sphere, idx) => {
+        const sa = (rsCurrentAnswers[sphere.name] || {});
+        let num = 0, den = 0, answered = 0;
+        for (const [qid, val] of Object.entries(sa)) {
+            if (val === '-1' || val === null || val === undefined) continue;
+            const r = Number(val); if (isNaN(r)) continue;
+            const a = rsImportanceMap[String(qid)] || 1;
+            num += a * r; den += a * 7; answered++;
+        }
+        rsTotalAnswered += answered;
+
+        const scoreEl   = document.getElementById('rs-sphere-score-number-' + (idx + 1));
+        const scoreLbl  = document.getElementById('rs-sphere-score-label-'  + (idx + 1));
+        const barFillEl = document.getElementById('rs-sphere-bar-fill-'     + (idx + 1));
+
+        if (den > 0) {
+            const score = num / den;
+            rsSphereIj.push(score);
+            const col = rsScoreColor(score);
+            if (scoreEl)   { scoreEl.textContent = score.toFixed(2); scoreEl.style.color = col; }
+            if (scoreLbl)  { scoreLbl.style.color = col; }
+            if (barFillEl) { barFillEl.style.width = (score * 100).toFixed(1) + '%'; barFillEl.style.background = rsScoreGradient(score); }
+        } else {
+            if (scoreEl)   scoreEl.textContent = '—';
+            if (barFillEl) barFillEl.style.width = '0%';
+        }
+    });
+
+    // Aggregate
+    const rsAggregate = rsSphereIj.length > 0
+        ? (rsSphereIj.reduce((a, b) => a + b, 0) / rsSphereIj.length).toFixed(2) : null;
+
+    const rsAggEl  = document.getElementById('rs-aggregate-index-value-display');
+    const rsAnsEl  = document.getElementById('rs-total-answered-count-display');
+    const rsPanAgg = document.getElementById('rs-panel-aggregate-mirror');
+    const rsPanAns = document.getElementById('rs-panel-answered-mirror');
+
+    if (rsAggEl)  rsAggEl.textContent  = rsAggregate || '—';
+    if (rsAnsEl)  rsAnsEl.textContent  = rsTotalAnswered || '—';
+    if (rsPanAgg) rsPanAgg.textContent = rsAggregate || '—';
+    if (rsPanAns) rsPanAns.textContent = rsTotalAnswered || '—';
+
+    // Update hero banner color band based on aggregate score
+    if (rsAggregate) {
+        const band = document.querySelector('.rs-aggregate-hero-color-band');
+        if (band) band.style.background = rsScoreGradient(parseFloat(rsAggregate));
+    }
+
+    // ── Radar chart ───────────────────────────────────────────────
+    const rsLabels   = rsSpheres.map(s => s.label);
+    const rsDatasets = rsRadarAnalyses.map((a, i) => {
+        const answers = a.answers_dict || a.answers || {};
+        const scores  = rsComputeSphereScores(answers);
+        const color   = RS_SERIES_COLORS[i % RS_SERIES_COLORS.length];
+        const label   = a.is_ai ? 'AI Baseline' : (a.is_current ? 'Current Analysis' : (a.title || 'Other'));
+        return {
+            label, data: scores,
+            borderColor: color,
+            backgroundColor: color + '18',
+            pointBackgroundColor: color,
+            pointBorderColor: 'transparent',
+            borderWidth: a.is_current ? 2.5 : 1.5,
+            pointRadius: a.is_current ? 4 : 3,
+        };
+    });
+
+    // Legend
+    const rsLegendEl = document.getElementById('rs-chart-panel-legend-list');
+    if (rsLegendEl) {
+        rsDatasets.forEach((ds, i) => {
+            const item = document.createElement('div');
+            item.className = 'rs-chart-panel-legend-item';
+            item.innerHTML = `<div class="rs-chart-panel-legend-color-swatch" style="background:${RS_SERIES_COLORS[i % RS_SERIES_COLORS.length]}"></div><span>${ds.label}</span>`;
+            rsLegendEl.appendChild(item);
+        });
+    }
+
+    // Render chart
+    const rsCanvas = document.getElementById('rsRadarChart');
+    if (rsCanvas && rsDatasets.length) {
+        new Chart(rsCanvas, {
+            type: 'radar',
+            data: { labels: rsLabels, datasets: rsDatasets },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                scales: {
+                    r: {
+                        min: 0, max: 1,
+                        ticks: { stepSize: 0.2, font: { size: 1 }, color: 'rgba(255,255,255,0.3)', backdropColor: 'transparent' },
+                        pointLabels: { font: { size: 9, weight: '700' }, color: 'rgba(255, 255, 0, 0.97)' },
+                        grid: { color: 'rgba(255,255,255,0.8)' },
+                        angleLines: { color: 'rgba(255,255,255,0.8)' }
+                    }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
+    }
+    } // end rsInitChart
+
+    // Guard: run after Chart.js is available
+    if (typeof Chart !== 'undefined') {
+        rsInitChart();
+    } else {
+        var rsChartScript = document.createElement('script');
+        rsChartScript.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js';
+        rsChartScript.onload = rsInitChart;
+        document.head.appendChild(rsChartScript);
+    }
+})();
+</script>

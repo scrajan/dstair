@@ -1,0 +1,70 @@
+{% macro analysis_modal(id, title, subtitle, form_id, is_edit) %}
+<div id="{{ id }}Overlay" class="modal-overlay fixed inset-0 z-[100] flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300 backdrop-blur-sm bg-brand-darker/40">
+    <div id="{{ id }}Content" class="modal-content w-[90%] max-w-lg bg-white rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-all duration-300 opacity-0 pointer-events-none">
+        
+
+        <!-- Body -->
+        <form id="{{ form_id }}" class="p-8 space-y-6">
+            {% if is_edit %}
+            <input type="hidden" id="editAnalysisId">
+            {% endif %}
+            
+            <div class="space-y-2">
+                <label class="text-[10px] font-bold text-brand-dark/50 uppercase tracking-widest px-1"> <span style="font-size:16px; background-color:rgba(225, 139, 19, 0.6); padding:2px 4px; border-radius:3px;">Analysis Title</span></label>
+                <input type="text" id="{{ 'editAnalysisTitle' if is_edit else 'analysisTitle' }}" 
+                       class="w-full px-4 py-3 bg-brand-light/30 border border-brand-dark/10 rounded-xl text-brand-dark font-semibold placeholder:text-brand-dark/30 focus:outline-none focus:border-brand-accent/50 transition-all"
+                       placeholder="e.g. 2024 Institutional Review">
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-[10px] font-bold text-brand-dark/50 uppercase tracking-widest px-1"><span style="font-size:16px; background-color:rgba(225, 139, 19, 0.6); padding:2px 4px; border-radius:3px;">Country Context</span></label>
+                <div style="position:relative;">
+                    <select id="{{ 'editAnalysisCountry' if is_edit else 'analysisCountry' }}"
+                            onchange="dstairModalFlagPreview(this, '{{ 'editFlagPreview' if is_edit else 'createFlagPreview' }}')"
+                            class="branded-select w-full px-4 py-3 bg-brand-light/30 border border-brand-dark/10 rounded-xl text-brand-dark font-semibold focus:outline-none focus:border-brand-accent/50 transition-all appearance-none cursor-pointer">
+                        {% include 'includes/country_options.html' %}
+                    </select>
+                    <img id="{{ 'editFlagPreview' if is_edit else 'createFlagPreview' }}"
+                         src="" alt="" width="24" height="16"
+                         style="display:none;position:absolute;right:2.5rem;top:50%;transform:translateY(-50%);border-radius:3px;object-fit:cover;pointer-events:none;">
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-[10px] font-bold text-brand-dark/50 uppercase tracking-widest px-1"><span style="font-size:16px; background-color:rgba(225, 139, 19, 0.6); padding:2px 4px; border-radius:3px;">Supplemental Notes</span></label>
+                <textarea id="{{ 'editAnalysisNotes' if is_edit else 'analysisNotes' }}" rows="3"
+                          class="w-full px-4 py-3 bg-brand-light/30 border border-brand-dark/10 rounded-xl text-brand-dark font-medium placeholder:text-brand-dark/30 focus:outline-none focus:border-brand-accent/50 transition-all resize-none"
+                          placeholder="Optional context or research parameters..."></textarea>
+            </div>
+        </form>
+
+        <!-- Footer -->
+        <div class="px-8 py-6 bg-brand-light/50 border-t border-brand-dark/5 flex justify-end gap-3">
+            <button onclick="close{{ 'Edit' if is_edit else '' }}Modal()" class="px-6 py-2.5 text-xs font-bold text-brand-dark/60 uppercase tracking-widest hover:text-brand-dark transition-colors">Cancel</button>
+            <button id="{{ 'submitEditBtn' if is_edit else 'submitBtn' }}" onclick="{{ 'submitEditAnalysis()' if is_edit else 'submitAnalysis()' }}"
+                    class="px-8 py-2.5 bg-brand-accent hover:bg-brand-accent-hover text-xs font-bold uppercase tracking-widest rounded-full transition-all shadow-lg shadow-brand-accent/20">
+                {{ 'Save Changes' if is_edit else 'Initialize Analysis' }}
+            </button>
+        </div>
+    </div>
+</div>
+{% endmacro %}
+
+{% macro delete_modal() %}
+<div id="deleteModalOverlay" class="modal-overlay fixed inset-0 z-[100] flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300 backdrop-blur-sm bg-red-950/20">
+    <div id="deleteModalContent" class="modal-content w-[90%] max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden transform scale-95 transition-all duration-300 opacity-0 pointer-events-none">
+        <div class="p-8 text-center space-y-4">
+            <div class="w-16 h-16 bg-red-50 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-red-100">
+                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 tracking-tight">Confirm Deletion</h3>
+            <p class="text-slate-500 text-sm leading-relaxed">Are you certain you wish to purge <span id="deleteAnalysisTitle" class="font-bold text-red-600"></span>? This action is irreversible and will permanently delete all associated diagnostic data.</p>
+        </div>
+        <div class="px-8 py-6 bg-slate-50 border-t border-slate-100 flex gap-3">
+            <button onclick="closeDeleteModal()" class="flex-1 py-3 text-xs font-bold text-slate-400 uppercase tracking-widest hover:text-slate-600 transition-colors">Cancel</button>
+            <button id="confirmDeleteBtn" onclick="confirmDelete()" class="flex-1 py-3 bg-red-600 hover:bg-red-700  text-xs font-bold uppercase tracking-widest rounded-xl transition-all shadow-lg shadow-red-600/20">Delete Analysis</button>
+        </div>
+        <input type="hidden" id="deleteAnalysisId">
+    </div>
+</div>
+{% endmacro %}

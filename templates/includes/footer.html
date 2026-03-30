@@ -1,0 +1,90 @@
+
+<footer id="dstair-footer" class="mt-auto border-t relative z-20 overflow-hidden">
+    <!-- Premium subtle glow/pattern in background -->
+    <div class="absolute inset-0 opacity-10 mix-blend-overlay pointer-events-none bg-pattern-dots-xl"></div>
+    <div
+        class="footer-brand-glow absolute top-0 right-0 w-[800px] h-[800px] rounded-full blur-[100px] -mr-48 -mt-48 pointer-events-none">
+    </div>
+
+    <div class="max-w-7xl mx-auto px-6 md:px-12 py-16 relative z-10">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-8">
+            <!-- Brand / Logo / Tagline / Socials -->
+            <div class="md:col-span-5 flex flex-col items-center md:items-start text-center md:text-left">
+                <div class="flex items-center gap-5 group cursor-pointer mb-6">
+                    <div
+                        class="w-20 h-20 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 flex items-center justify-center p-3.5 shadow-xl group-hover:bg-white/20 transition-all duration-300">
+                        <img src="{{ url_for('static', filename='assets/general/logo.png') }}" alt="DSTAIR Logo"
+                            class="h-full w-auto object-contain opacity-90 group-hover:opacity-100 transition-opacity drop-shadow-md">
+                    </div>
+                    <div>
+                        <div class="flex items-baseline">
+                            <span
+                                class="font-serif text-5xl font-black tracking-tight text-white group-hover:text-emerald-300 transition-colors drop-shadow-md block">DSTAIR</span>
+                            <!-- <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block ml-1"></span> -->
+                        </div>
+                        <!-- <p class="text-emerald-200/70 text-xs font-sans uppercase font-bold tracking-[0.25em] mt-1">
+                            Institutional
+                            Reform Analytics</p> -->
+                    </div>
+                </div>
+                <p class="text-white/70 font-sans font-light leading-relaxed max-w-sm mb-8 text-sm md:text-base">
+                    The global standard for institutional reform analysis. Quantifying the legitimacy of governance
+                    using advanced social metrics.
+                </p>
+               
+               
+            </div>
+
+            <!-- Navigation Links -->
+            <div class="md:col-span-3">
+                <h4 class="text-white font-serif font-bold text-lg mb-6 flex items-center gap-2">
+                    <span class="w-4 h-[1px] bg-emerald-400 inline-block"></span> Navigation
+                </h4>
+                <nav class="flex flex-col gap-4">
+                    <a href="{{ url_for('public.home') }}"
+                        class="footer-nav-link text-sm font-sans font-medium transition-colors relative group inline-flex w-fit">
+                        Home
+                        <span
+                            class="hover-line absolute -bottom-1 left-0 w-0 h-px transition-all duration-300 group-hover:w-full"></span>
+                    </a>
+                    <a href="{{ url_for('public.how_it_works') }}"
+                        class="footer-nav-link text-sm font-sans font-medium transition-colors relative group inline-flex w-fit">
+                        Methodology
+                        <span
+                            class="hover-line absolute -bottom-1 left-0 w-0 h-px transition-all duration-300 group-hover:w-full"></span>
+                    </a>
+                    <a href="{{ url_for('public.resources') }}"
+                        class="footer-nav-link text-sm font-sans font-medium transition-colors relative group inline-flex w-fit">
+                        Resources
+                        <span
+                            class="hover-line absolute -bottom-1 left-0 w-0 h-px transition-all duration-300 group-hover:w-full"></span>
+                    </a>
+                    {% if not current_user.is_authenticated %}
+                    <a href="{{ url_for('auth.login') }}"
+                        class="text-sm font-sans font-bold text-emerald-300 hover:text-white transition-colors relative group inline-flex w-fit mt-2">
+                        Login to System &rarr;
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('dashboard.index', username=current_user.user_account_unique_username_string) }}"
+                        class="text-sm font-sans font-bold text-emerald-300 hover:text-white transition-colors relative group inline-flex w-fit mt-2">
+                        Goto Dashboard &rarr;
+                    </a>
+                    {% endif %}
+                </nav>
+            </div>
+
+            
+        </div>
+
+        <div
+            class="mt-16 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
+            <p class="text-xs font-sans font-light text-white/40">
+                &copy; {{ current_year | default('2026') }} DSTAIR. All rights reserved.
+            </p>
+            <!-- <div class="flex gap-6 text-xs font-sans font-light text-white/40">
+                <a href="#" class="hover:text-white transition">Privacy Policy</a>
+                <a href="#" class="hover:text-white transition">Terms of Service</a>
+            </div> -->
+        </div>
+    </div>
+</footer>

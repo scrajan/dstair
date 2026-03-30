@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Comments - DSTAIR Admin{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+<!-- 
+  =============================================================================
+  ADMIN COMMENTS STYLES (.a-com-*)
+  Strictly scoped to admin/comments.html ONLY. Zero inheritance.
+  =============================================================================
+-->
+
+{% endblock %}
+
+{% block content %}
+<section class="a-com-page">
+    <div class="a-com-wrap">
+
+        <!-- Header -->
+        <div class="a-com-hdr-area">
+            <div>
+                <span class="a-com-lbl">Administration</span>
+                <h1 class="a-com-h1">Manage Comments</h1>
+                <p class="a-com-sub">Review and moderate user comments across all questions.</p>
+            </div>
+            <a href="{{ url_for('admin.dashboard') }}" class="a-com-back">Back to Dashboard</a>
+        </div>
+
+        <!-- Table Panel -->
+        <div class="a-com-panel">
+            <table class="a-com-table">
+                <thead>
+                    <tr>
+                        <th class="a-com-th">User</th>
+                        <th class="a-com-th">Comment</th>
+                        <th class="a-com-th">Question</th>
+                        <th class="a-com-th">Date</th>
+                        <th class="a-com-th text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for comment in comments %}
+                    <tr class="a-com-tr" id="row-{{ comment.id }}">
+                        <td class="a-com-td">
+                            <div class="a-com-user">
+                                <div class="a-com-av">
+                                    {{ comment.user[:2].upper() }}
+                                </div>
+                                <span class="a-com-name">{{ comment.user }}</span>
+                            </div>
+                        </td>
+                        <td class="a-com-td">
+                            <p class="a-com-text">{{ comment.comment }}</p>
+                        </td>
+                        <td class="a-com-td">
+                            {% if comment.analysis_id %}
+                            <a href="{{ url_for('analysis.view', username=comment.user, analysis_id=comment.analysis_id) }}#question-{{ comment['question_id'] }}"
+                                class="a-com-qlink">
+                                Q{{ comment['question_id'] }}
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" class="a-com-qlink-ico">
+                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                    <polyline points="15 3 21 3 21 9"></polyline>
+                                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                                </svg>
+                            </a>
+                            {% else %}
+                            <span class="a-com-qlink" style="opacity:0.4;cursor:default;">Q{{ comment['question_id'] }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="a-com-td">
+                            <p class="a-com-meta">{{ comment.date }}</p>
+                        </td>
+                        <td class="a-com-td">
+                            <button onclick="deleteCommentAdmin({{ comment.question_id }}, '{{ comment.id }}')"
+                                class="a-com-del" title="Delete Comment">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path
+                                        d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                    </path>
+                                </svg>
+                            </button>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="a-com-td a-com-empty">
+                            No comments found.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if total > limit %}
+        <div class="a-com-load">
+            <a href="{{ url_for('admin.comments', limit=limit + 50) }}" class="a-com-lbtn">Load More Comments</a>
+            <p class="a-com-ltxt">Showing {{ comments|length }} of {{ total }}</p>
+        </div>
+        {% endif %}
+
+    </div>
+</section>
+
+<script>
+    function deleteCommentAdmin(questionId, commentId) {
+        if (!confirm('Are you sure you want to delete this comment? This action cannot be undone.')) return;
+
+        // Using the same API endpoint as the frontend
+        fetch(`/analysis/question/${questionId}/comment/${commentId}/delete`, {
+            method: 'DELETE',
+            headers: { 'X-CSRFToken': getCSRFToken() },
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const row = document.getElementById(`row-${commentId}`);
+                    if (row) {
+                        row.style.opacity = '0';
+                        setTimeout(() => row.remove(), 300);
+                    }
+                } else {
+                    alert('Error: ' + (data.error || 'Failed to delete'));
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Failed to communicate with server');
+            });
+    }
+</script>
+{% endblock %}

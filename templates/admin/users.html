@@ -1,0 +1,330 @@
+{% extends 'base.html' %}
+
+{% block title %}User Management - DSTAIR Admin{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+<!-- 
+  =============================================================================
+  ADMIN USERS STYLES (.a-usr-*)
+  Strictly scoped to admin/users.html ONLY. Zero inheritance.
+  =============================================================================
+-->
+
+{% endblock %}
+
+{% block content %}
+<section class="a-usr-page">
+    <div class="a-usr-wrap">
+
+        <!-- Header part -->
+        <a href="{{ url_for('admin.dashboard') }}" class="a-usr-back">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2.5" class="a-usr-back-ico">
+                <path d="M19 12H5" />
+                <path d="m12 19-7-7 7-7" />
+            </svg>
+            Back to Admin Dashboard
+        </a>
+
+        <div class="a-usr-hdr">
+            <div>
+                <span class="a-usr-lbl">Administration</span>
+                <h1 class="a-usr-h1">User <span class="a-usr-h1-hl">Management</span></h1>
+            </div>
+            <button onclick="openCreateUserModal()" class="a-usr-btn-new">
+                + Create User
+            </button>
+        </div>
+
+        <!-- Search Box -->
+        <div class="a-usr-search-box">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2.5" class="a-usr-search-ico">
+                <circle cx="11" cy="11" r="8" />
+                <path d="m21 21-4.35-4.35" />
+            </svg>
+            <input type="text" placeholder="Search users by username or email..." class="a-usr-search-inp"
+                id="aUsrSearch">
+        </div>
+
+        <!-- Table -->
+        <div class="a-usr-tab-wrap">
+            <table class="a-usr-table">
+                <thead>
+                    <tr>
+                        <th class="a-usr-th">ID</th>
+                        <th class="a-usr-th">User</th>
+                        <th class="a-usr-th">Email</th>
+                        <th class="a-usr-th">Role & Status</th>
+                        <th class="a-usr-th text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr class="a-usr-tr js-usr-row">
+                        <td class="a-usr-td">
+                            <span class="a-usr-id">#{{ user.unique_database_identifier_integer }}</span>
+                        </td>
+                        <td class="a-usr-td">
+                            <div class="a-usr-pblock">
+                                <div class="a-usr-avatar">
+                                    {% if user.file_path_string_for_user_profile_avatar_image %}
+                                    <img src="{{ url_for('static', filename='uploads/profiles/' ~ user.file_path_string_for_user_profile_avatar_image) }}"
+                                        alt="{{ user.user_account_unique_username_string }}">
+                                    {% else %}
+                                    {{ user.user_account_unique_username_string[0].upper() }}
+                                    {% endif %}
+                                </div>
+                                <p class="a-usr-name js-usr-name">{{ user.user_account_unique_username_string }}</p>
+                            </div>
+                        </td>
+                        <td class="a-usr-td">
+                            {% if user.user_account_authentication_email_address_string %}
+                            <p class="a-usr-email js-usr-email">{{ user.user_account_authentication_email_address_string
+                                }}</p>
+                            {% else %}
+                            <p class="a-usr-email a-usr-email--null js-usr-email">Not provided</p>
+                            {% endif %}
+                        </td>
+                        <td class="a-usr-td">
+                            <div class="a-usr-role-badges">
+                                <span
+                                    class="a-usr-badge {% if user.user_account_authorization_role_identifier_string == 'admin' %}a-usr-badge--admin{% else %}a-usr-badge--user{% endif %}">
+                                    {{ user.user_account_authorization_role_identifier_string }}
+                                </span>
+                                {% if user.boolean_flag_indicating_if_user_account_is_active_and_not_blacklisted is
+                                defined and not
+                                user.boolean_flag_indicating_if_user_account_is_active_and_not_blacklisted %}
+                                <span class="a-usr-badge a-usr-badge--bl">Blacklisted</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td class="a-usr-td">
+                            <div class="a-usr-acts">
+                                <!-- Edit Button -->
+                                <button
+                                    onclick="openEditUserModal({{ user.unique_database_identifier_integer }}, {{ user.user_account_unique_username_string|tojson|forceescape }}, {{ (user.user_account_full_name_string or '')|tojson|forceescape }}, {{ (user.user_account_authentication_email_address_string or '')|tojson|forceescape }}, {{ user.user_account_authorization_role_identifier_string|tojson|forceescape }})"
+                                    class="a-usr-act-btn" title="Edit">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                        fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+                                        <path d="m15 5 4 4" />
+                                    </svg>
+                                </button>
+
+                                <!-- Blacklist Toggle Button -->
+                                {% if user.user_account_authorization_role_identifier_string != 'admin' %}
+                                <form
+                                    action="{{ url_for('admin.toggle_blacklist', user_id=user.unique_database_identifier_integer) }}"
+                                    method="POST" class="a-usr-act-form"
+                                    onsubmit="return confirm('{{ 'Unblacklist' if (user.boolean_flag_indicating_if_user_account_is_active_and_not_blacklisted is defined and not user.boolean_flag_indicating_if_user_account_is_active_and_not_blacklisted) else 'Blacklist' }} this user?');">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    {% set is_bl =
+                                    (user.boolean_flag_indicating_if_user_account_is_active_and_not_blacklisted is
+                                    defined and not
+                                    user.boolean_flag_indicating_if_user_account_is_active_and_not_blacklisted) %}
+                                    <button type="submit"
+                                        class="a-usr-act-btn a-usr-act-btn--warn {% if is_bl %}is-bl{% endif %}"
+                                        title="{{ 'Unblacklist' if is_bl else 'Blacklist' }}">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                        </svg>
+                                    </button>
+                                </form>
+                                {% endif %}
+
+                                <!-- Delete Button -->
+                                <form
+                                    action="{{ url_for('admin.delete_user', user_id=user.unique_database_identifier_integer) }}"
+                                    method="POST" class="a-usr-act-form"
+                                    onsubmit="return confirm('Are you sure you want to delete this user?');">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="a-usr-act-btn a-usr-act-btn--dang" title="Delete">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M3 6h18" />
+                                            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                                            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                                        </svg>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</section>
+
+<!-- ── MODALS ────────────────────────────────────────────────────────────── -->
+<!-- Create Modal -->
+<div class="a-usr-m-overlay" id="create-user-modal"></div>
+<div class="a-usr-m-wrap" id="create-user-wrap">
+    <div class="a-usr-m-panel">
+        <button class="a-usr-m-close" onclick="closeCreateUserModal()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2.5">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
+        <h2 class="a-usr-m-h2">Create New User</h2>
+        <form action="{{ url_for('admin.create_user') }}" method="POST" class="a-usr-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="a-usr-field">
+                <label class="a-usr-flbl">Username</label>
+                <input type="text" name="username" required class="a-usr-finp" placeholder="Enter username">
+            </div>
+            <div class="a-usr-field">
+                <label class="a-usr-flbl">Name</label>
+                <input type="text" name="name" class="a-usr-finp" placeholder="Enter full name (optional)">
+            </div>
+            <div class="a-usr-field">
+                <label class="a-usr-flbl">Email</label>
+                <input type="email" name="email" class="a-usr-finp" placeholder="Enter email (optional)">
+            </div>
+            <div class="a-usr-field">
+                <label class="a-usr-flbl">Password</label>
+                <input type="password" name="password" required class="a-usr-finp" placeholder="Enter password">
+            </div>
+            <div class="a-usr-field">
+                <label class="a-usr-flbl">Role</label>
+                <div class="a-usr-fsel-wrap">
+                    <select name="role" class="a-usr-finp">
+                        <option value="user">User</option>
+                        <option value="ai">AI Evaluator</option>
+                    </select>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2.5" class="a-usr-fsel-ico">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+            </div>
+            <button type="submit" class="a-usr-fbtn">Create User</button>
+        </form>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="a-usr-m-overlay" id="edit-user-modal"></div>
+<div class="a-usr-m-wrap" id="edit-user-wrap">
+    <div class="a-usr-m-panel">
+        <button class="a-usr-m-close" onclick="closeEditUserModal()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2.5">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
+        <h2 class="a-usr-m-h2">Edit User</h2>
+        <form id="edit-user-form" action="" method="POST" class="a-usr-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="a-usr-field">
+                <label class="a-usr-flbl">Username</label>
+                <input type="text" name="username" id="edit-username" required class="a-usr-finp">
+            </div>
+            <div class="a-usr-field">
+                <label class="a-usr-flbl">Name</label>
+                <input type="text" name="name" id="edit-name" class="a-usr-finp"
+                    placeholder="Enter full name (optional)">
+            </div>
+            <div class="a-usr-field">
+                <label class="a-usr-flbl">Email</label>
+                <input type="email" name="email" id="edit-email" class="a-usr-finp">
+            </div>
+            <div class="a-usr-field">
+                <label class="a-usr-flbl">Password</label>
+                <input type="password" name="password" class="a-usr-finp" placeholder="Leave blank to keep current">
+            </div>
+            <div class="a-usr-field">
+                <label class="a-usr-flbl">Role</label>
+                <div class="a-usr-fsel-wrap">
+                    <select name="role" id="edit-role" class="a-usr-finp">
+                        <option value="user">User</option>
+                        <option value="ai">AI Evaluator</option>
+                    </select>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2.5" class="a-usr-fsel-ico">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </div>
+            </div>
+            <button type="submit" class="a-usr-fbtn">Update User</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Create User Modal Logic
+    function openCreateUserModal() {
+        const over = document.getElementById('create-user-modal');
+        const wrap = document.getElementById('create-user-wrap');
+        over.classList.add('active');
+        wrap.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeCreateUserModal() {
+        const over = document.getElementById('create-user-modal');
+        const wrap = document.getElementById('create-user-wrap');
+        over.classList.remove('active');
+        wrap.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    // Edit User Modal Logic
+    function openEditUserModal(id, username, name, email, role) {
+        document.getElementById('edit-user-form').action = `/admin/users/${id}/edit`;
+        document.getElementById('edit-username').value = username;
+        document.getElementById('edit-name').value = name && name !== 'None' ? name : '';
+        document.getElementById('edit-email').value = email && email !== 'None' ? email : '';
+        document.getElementById('edit-role').value = role;
+
+        const over = document.getElementById('edit-user-modal');
+        const wrap = document.getElementById('edit-user-wrap');
+        over.classList.add('active');
+        wrap.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeEditUserModal() {
+        const over = document.getElementById('edit-user-modal');
+        const wrap = document.getElementById('edit-user-wrap');
+        over.classList.remove('active');
+        wrap.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    // Custom overlay click to close
+    document.getElementById('create-user-modal').addEventListener('click', closeCreateUserModal);
+    document.getElementById('edit-user-modal').addEventListener('click', closeEditUserModal);
+
+    // Search functionality based on the custom semantic classes
+    const searchInput = document.getElementById('aUsrSearch');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('.js-usr-row');
+
+            rows.forEach(row => {
+                const usernameEl = row.querySelector('.js-usr-name');
+                const emailEl = row.querySelector('.js-usr-email');
+
+                const username = usernameEl ? usernameEl.textContent.toLowerCase() : '';
+                const email = emailEl ? emailEl.textContent.toLowerCase() : '';
+
+                if (username.includes(searchTerm) || email.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    }
+</script>
+{% endblock %}

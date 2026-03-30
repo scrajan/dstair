@@ -1,0 +1,1806 @@
+{% extends 'base.html' %}
+
+{% block title %}Resources | DSTAIR{% endblock %}
+
+{% block extra_css %}
+<!-- 
+  =============================================================================
+  PAGE-SPECIFIC STYLES (resources.html)
+  =============================================================================
+  → “Add this to constitution.md” (Unique Scoped CSS refactoring pattern)
+  Every structural, layout, and visual component on this page is governed by
+  its own bespoke, isolated CSS class. Zero style repetition from other pages.
+  =============================================================================
+-->
+<style>
+    /* Base Reset & Variables for this scope */
+    .res-page {
+        background: #020617;
+        overflow-x: hidden;
+        position: relative;
+        font-family: 'Inter', sans-serif;
+        color: #ffffff;
+    }
+
+    /* Background Enhancements */
+    .res-bg {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+        background: radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.03), transparent 60%),
+            radial-gradient(circle at 90% 80%, rgba(217, 119, 6, 0.03), transparent 60%),
+            #020617;
+    }
+
+    .res-bg-pattern {
+        position: absolute;
+        inset: 0;
+        opacity: 0.12;
+        background-image: linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+        background-size: 60px 60px;
+        mask: radial-gradient(circle at center, black 40%, transparent 80%);
+        -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 80%);
+    }
+
+    .res-bg-glow-tr {
+        position: absolute;
+        top: -10%;
+        right: -5%;
+        width: 50vw;
+        height: 50vw;
+        background: rgba(217, 119, 6, 0.06);
+        filter: blur(150px);
+        border-radius: 50%;
+    }
+
+    .res-bg-glow-bl {
+        position: absolute;
+        bottom: 10%;
+        left: -10%;
+        width: 50vw;
+        height: 50vw;
+        background: rgba(56, 189, 248, 0.06);
+        filter: blur(150px);
+        border-radius: 50%;
+    }
+
+    /* --------------------------------------------------------------------------
+   Header / Hero Section
+   -------------------------------------------------------------------------- */
+    @keyframes resPulseGlow {
+
+        0%,
+        100% {
+            opacity: 0.5;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+    }
+
+    .res-hero {
+        position: relative;
+        z-index: 2;
+        padding: 6rem 1.5rem 8rem;
+        overflow: hidden;
+        min-height: 60vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .res-hero-bg {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+    }
+
+    .res-hero-bg img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        filter: brightness(1.4) saturate(0.8);
+    }
+
+    .res-hero-bg-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to bottom,
+                rgba(2, 6, 23, 0.04) 0%,
+                rgba(2, 6, 23, 0.8) 70%,
+                #020617 100%);
+        z-index: 2;
+    }
+
+    .res-hero-glow-main {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 60vw;
+        height: 60vh;
+        background: radial-gradient(circle, rgba(56, 189, 248, 0.15) 0%, transparent 70%);
+        filter: blur(100px);
+        z-index: 3;
+        animation: resPulseGlow 15s ease-in-out infinite;
+    }
+
+    @media (min-width: 768px) {
+        .res-hero {
+            padding: 8.8rem 2.5rem 2rem;
+        }
+    }
+
+    .res-hero::before {
+        content: '';
+        position: absolute;
+        top: -20%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80vw;
+        height: 60vh;
+        background: radial-gradient(ellipse at center, rgba(56, 189, 248, 0.1) 0%, transparent 70%);
+        filter: blur(80px);
+        pointer-events: none;
+        animation: resPulseGlow 12s ease-in-out infinite;
+    }
+
+    .res-hero-wrap {
+        max-width: 1000px;
+        margin: 0 auto;
+        text-align: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        padding-bottom: 4rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        z-index: 10;
+    }
+
+    .res-hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.5rem 1.25rem;
+        background: rgba(56, 189, 248, 0.05);
+        border: 1px solid rgba(56, 189, 248, 0.2);
+        border-radius: 2rem;
+        margin-bottom: 2.5rem;
+        backdrop-filter: blur(8px);
+    }
+
+    .res-hero-badge-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background-color: #38bdf8;
+        box-shadow: 0 0 10px #38bdf8;
+        animation: resPulse 2s infinite;
+    }
+
+    @keyframes resPulse {
+
+        0%,
+        100% {
+            opacity: 1;
+        }
+
+        50% {
+            opacity: 0.4;
+        }
+    }
+
+    .res-hero-badge-txt {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.75rem;
+        font-weight: 800;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: #38bdf8;
+    }
+
+    .res-hero-h1 {
+        font-family: 'Outfit', sans-serif;
+        font-size: clamp(5rem, 7vw, 7rem);
+        font-weight: 900;
+        color: #ffffff;
+        margin: 0 0 2rem 0;
+        line-height: 0.95;
+        letter-spacing: -0.04em;
+    }
+
+    .res-hero-h1 span {
+        background: linear-gradient(135deg, #0ea5e9, #38bdf8, #7dd3fc);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .res-hero-p {
+        font-family: 'Inter', sans-serif;
+        font-size: 1.25rem;
+        line-height: 1.9;
+        color: #94a3b8;
+        font-weight: 400;
+        max-width: 760px;
+        margin: 0 auto;
+    }
+
+    .res-hero-nav {
+        display: none;
+    }
+
+    @media (min-width: 768px) {
+        .res-hero-nav {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 2.5rem;
+            margin-top: 3rem;
+        }
+    }
+
+    .res-hero-nav a {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.875rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: rgba(255, 255, 255, 0.6);
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        transition: all 0.3s ease;
+    }
+
+    .res-hero-nav a:hover {
+        color: #ffffff;
+        transform: translateY(-2px);
+    }
+
+    .res-hero-nav a::before {
+        content: '';
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .res-hero-nav a:hover::before {
+        background: #38bdf8;
+        box-shadow: 0 0 8px #38bdf8;
+        transform: scale(1.5);
+    }
+
+    .res-hero-nav-div {
+        color: rgba(255, 255, 255, 0.1);
+    }
+
+    /* --------------------------------------------------------------------------
+   General Section Styles
+   -------------------------------------------------------------------------- */
+    .res-sec {
+        position: relative;
+        z-index: 2;
+        padding: 8rem 1.5rem;
+    }
+
+    @media (min-width: 768px) {
+        .res-sec {
+            padding: 4rem 2.5rem;
+        }
+    }
+
+    .res-sec-wrap {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .res-sec-head {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .res-sec-num {
+        font-family: 'Outfit', sans-serif;
+        font-size: 5.6rem;
+        font-weight: 900;
+        color: rgba(49, 44, 44, 0.6);
+        line-height: 1;
+        letter-spacing: -0.05em;
+    }
+
+    .res-sec-title-wrap {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .res-sec-h2 {
+        font-family: 'Outfit', sans-serif;
+        font-size: clamp(2rem, 3.5vw, 3rem);
+        font-weight: 800;
+        color: #ffffff;
+        margin: 0;
+        letter-spacing: -0.03em;
+        line-height: 1.1;
+    }
+
+    .res-sec-p {
+        font-family: 'Inter', sans-serif;
+        font-size: 1rem;
+        color: #94a3b8;
+        margin: 0.5rem 0 0;
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        font-weight: 700;
+    }
+
+    .res-sec-line {
+        height: 1px;
+        flex-grow: 1;
+        margin-left: 1.5rem;
+    }
+
+    /* --------------------------------------------------------------------------
+   Section 01: Core Infrastructure
+   -------------------------------------------------------------------------- */
+    .res-core {
+        background: #ffffff;
+      
+    }
+
+    .res-core .res-sec-num {
+        color: rgba(15, 23, 42, 0.5);
+    }
+
+    .res-core .res-sec-h2 {
+        color: #0f172a;
+    }
+
+    .res-core .res-sec-p {
+        color: #10b981;
+    }
+
+    .res-core .res-sec-line {
+        background: rgba(15, 23, 42, 0.8);
+    }
+
+    .res-core-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    @media (min-width: 768px) {
+        .res-core-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2.5rem;
+        }
+    }
+
+    .res-card-glass {
+        background: #f8fafc;
+        border: 10px solid #d5c31c;
+        border-radius: 6rem;
+        padding: 3rem 2.5rem;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: 0 10px 40px rgba(15, 23, 42, 0.03);
+    }
+
+    /* .res-card-glass:hover {
+        border-color: rgba(16, 185, 129, 0.4);
+        transform: translateY(-10px);
+        box-shadow: 0 30px 60px rgba(16, 185, 129, 0.1);
+    } */
+
+    .res-card-glass-glow {
+        position: absolute;
+        top: -3rem;
+        right: -3rem;
+        width: 10rem;
+        height: 10rem;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
+        transition: transform 0.6s ease;
+        pointer-events: none;
+    }
+
+    /* .res-card-glass:hover .res-card-glass-glow {
+        transform: scale(2.5);
+    } */
+
+    .res-card-ico {
+        width: 3.5rem;
+        height: 3.5rem;
+        border-radius: 1rem;
+        background: #0f172a;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 2rem;
+        position: relative;
+        z-index: 2;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        transition: all 0.4s ease;
+    }
+
+    .res-card-glass:hover .res-card-ico {
+        background: #10b981;
+        transform: scale(1.1) rotate(-5deg);
+        box-shadow: 0 15px 30px rgba(16, 185, 129, 0.4);
+    }
+
+    .res-card-h3 {
+        font-family: 'Outfit', sans-serif;
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin: 0 0 1rem;
+        position: relative;
+        z-index: 2;
+        letter-spacing: -0.02em;
+    }
+
+    .res-card-p {
+        font-family: 'Inter', sans-serif;
+        font-size: 1rem;
+        font-weight: 400;
+        line-height: 1.8;
+        color: #64748b;
+        margin: 0 0 2.5rem;
+        flex-grow: 1;
+        position: relative;
+        z-index: 2;
+    }
+
+    .res-card-link {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.8125rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        color: #0f172a;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        border-top: 1px solid rgba(15, 23, 42, 0.06);
+        padding-top: 1.75rem;
+        position: relative;
+        z-index: 2;
+        transition: color 0.3s ease;
+        cursor: pointer;
+    }
+
+    .res-card-glass:hover .res-card-link {
+        color: #10b981;
+    }
+
+    .res-card-special {
+        background: linear-gradient(145deg, #0f172a, #020617);
+        border: 1px solid rgba(217, 119, 6, 0.4);
+        border-radius: 6rem;
+        padding: 3rem 2.5rem;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+        color: #ffffff;
+    }
+
+    /* .res-card-special:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 30px 60px rgba(217, 119, 6, 0.3), inset 0 0 0 1px rgba(217, 119, 6, 0.3);
+        border-color: #d97706;
+    } */
+
+    .res-card-sp-glow {
+        position: absolute;
+        top: -4rem;
+        right: -4rem;
+        width: 14rem;
+        height: 14rem;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(217, 119, 6, 0.2) 0%, transparent 60%);
+        transition: transform 0.6s ease;
+        pointer-events: none;
+    }
+
+    .res-card-special:hover .res-card-sp-glow {
+        transform: scale(1.5);
+    }
+
+    .res-card-sp-ico {
+        width: 3.5rem;
+        height: 3.5rem;
+        border-radius: 1rem;
+        background: rgba(217, 119, 6, 0.1);
+        border: 1px solid rgba(217, 119, 6, 0.3);
+        backdrop-filter: blur(8px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #d97706;
+        margin-bottom: 2rem;
+        position: relative;
+        z-index: 2;
+        transition: all 0.4s ease;
+    }
+
+    .res-card-special:hover .res-card-sp-ico {
+        background: #d97706;
+        color: #ffffff;
+        transform: scale(1.1) rotate(5deg);
+        box-shadow: 0 15px 30px rgba(217, 119, 6, 0.5);
+    }
+
+    .res-card-sp-h3 {
+        font-family: 'Outfit', sans-serif;
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: #ffffff;
+        margin: 0 0 1rem;
+        position: relative;
+        z-index: 2;
+        letter-spacing: -0.02em;
+    }
+
+    .res-card-sp-p {
+        font-family: 'Inter', sans-serif;
+        font-size: 1rem;
+        font-weight: 400;
+        line-height: 1.8;
+        color: #94a3b8;
+        margin: 0 0 2.5rem;
+        flex-grow: 1;
+        position: relative;
+        z-index: 2;
+    }
+
+    .res-card-sp-link {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.8125rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        color: #d97706;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        padding-top: 1.75rem;
+        position: relative;
+        z-index: 2;
+        transition: color 0.3s ease;
+        cursor: pointer;
+    }
+
+    .res-card-special:hover .res-card-sp-link {
+        color: #fde68a;
+    }
+
+    /* --------------------------------------------------------------------------
+   Section 02: Laws & Treaties
+   -------------------------------------------------------------------------- */
+    .res-laws {
+        position: relative;
+        background: linear-gradient(rgba(15, 23, 42, 0.7), rgba(2, 6, 23, 0.9)),
+            url('static/assets/resources-page/un.jpg');
+        background-attachment: fixed;
+        background-size: cover;
+        background-position: center;
+    }
+
+    .res-laws::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        opacity: 0.03;
+        background-image: linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.5) 1px, transparent 1px);
+        background-size: 40px 40px;
+        pointer-events: none;
+    }
+
+    .res-laws .res-sec-line {
+        background: rgba(56, 189, 248, 0.8);
+    }
+
+    .res-laws .res-sec-p {
+        color: #38bdf8;
+    }
+
+    .res-laws .res-sec-num {
+        color: rgba(242, 242, 243, 0.7);
+    }
+
+
+    .res-laws-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        position: relative;
+        z-index: 5;
+    }
+
+    @media (min-width: 768px) {
+        .res-laws-grid {
+            grid-template-columns: repeat(12, 1fr);
+        }
+    }
+
+    .res-laws-card {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 2rem;
+        position: relative;
+        transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        cursor: pointer;
+        overflow: hidden;
+        backdrop-filter: blur(19px);
+        -webkit-backdrop-filter: blur(19px);
+        border-color: rgba(56, 189, 248, 0.4);
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(56, 189, 248, 0.1);
+
+    }
+
+
+    .res-laws-card-lg {
+        grid-column: span 12;
+    }
+
+    @media (min-width: 768px) {
+        .res-laws-card-lg {
+            grid-column: span 8;
+        }
+    }
+
+    .res-laws-card-md {
+        grid-column: span 12;
+        display: flex;
+        flex-direction: column;
+        padding: 3rem;
+        border-left: 4px solid #38bdf8;
+    }
+
+    @media (min-width: 768px) {
+        .res-laws-card-md {
+            grid-column: span 4;
+        }
+    }
+
+    .res-laws-card-sm {
+        grid-column: span 12;
+        padding: 2.5rem;
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        border-left: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    @media (min-width: 768px) {
+        .res-laws-card-sm {
+            grid-column: span 6;
+        }
+    }
+
+    .res-laws-flex {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    @media (min-width: 768px) {
+        .res-laws-flex {
+            flex-direction: row;
+        }
+    }
+
+    .res-laws-f-left {
+        padding: 3.5rem;
+        border-left: 6px solid #38bdf8;
+        flex-grow: 1;
+    }
+
+    @media (min-width: 768px) {
+        .res-laws-f-left {
+            width: 66.666%;
+        }
+    }
+
+    .res-laws-badge {
+        display: inline-flex;
+        padding: 0.5rem 1rem;
+        background: rgba(56, 189, 248, 0.1);
+        color: #7dd3fc;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        border-radius: 2rem;
+        margin-bottom: 2rem;
+        border: 1px solid rgba(56, 189, 248, 0.2);
+    }
+
+    .res-laws-lg-h3 {
+        font-family: 'Outfit', sans-serif;
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: #ffffff;
+        margin: 0 0 1.25rem;
+        letter-spacing: -0.03em;
+        line-height: 1.1;
+    }
+
+    .res-laws-lg-p {
+        font-family: 'Inter', sans-serif;
+        font-size: 1.125rem;
+        font-weight: 400;
+        line-height: 1.8;
+        color: #94a3b8;
+        margin: 0 0 2rem;
+    }
+
+    .res-laws-link {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.875rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        color: #38bdf8;
+        transition: color 0.3s ease;
+    }
+
+    .res-laws-card:hover .res-laws-link {
+        color: #bae6fd;
+    }
+
+    .res-laws-f-right {
+        background: rgba(255, 255, 255, 0.02);
+        color: #ffffff;
+        padding: 3rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        border-left: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    @media (min-width: 768px) {
+        .res-laws-f-right {
+            width: 33.333%;
+        }
+    }
+
+    .res-laws-fr-num {
+        font-family: 'Outfit', sans-serif;
+        font-size: 6rem;
+        font-weight: 900;
+        color: #38bdf8;
+        line-height: 1;
+        margin-bottom: 0.5rem;
+        text-shadow: 0 0 30px rgba(56, 189, 248, 0.4);
+    }
+
+    .res-laws-fr-lbl {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.2em;
+        color: #94a3b8;
+    }
+
+    .res-laws-md-ico {
+        width: 3.5rem;
+        height: 3.5rem;
+        border-radius: 50%;
+        background: rgba(56, 189, 248, 0.1);
+        border: 1px solid rgba(56, 189, 248, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #38bdf8;
+        margin-bottom: 2rem;
+        transition: all 0.4s ease;
+    }
+
+    .res-laws-card:hover .res-laws-md-ico {
+        background: #38bdf8;
+        color: #ffffff;
+        transform: scale(1.1) rotate(15deg);
+        box-shadow: 0 0 20px rgba(56, 189, 248, 0.5);
+    }
+
+    .res-laws-md-h3 {
+        font-family: 'Outfit', sans-serif;
+        font-size: 1.75rem;
+        font-weight: 800;
+        color: #ffffff;
+        margin: 0 0 1rem;
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+    }
+
+    .res-laws-md-p {
+        font-family: 'Inter', sans-serif;
+        font-size: 1rem;
+        font-weight: 400;
+        line-height: 1.8;
+        color: #94a3b8;
+        margin: 0 0 2rem;
+        flex-grow: 1;
+    }
+
+    .res-laws-md-link {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.8125rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        color: #38bdf8;
+        transition: color 0.3s ease;
+    }
+
+    .res-laws-card:hover .res-laws-md-link {
+        color: #bae6fd;
+    }
+
+    .res-laws-sm-ico {
+        width: 4rem;
+        height: 4rem;
+        border-radius: 1rem;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #cbd5e1;
+        flex-shrink: 0;
+        transition: all 0.4s ease;
+    }
+
+    .res-laws-card:hover .res-laws-sm-ico {
+        transform: scale(1.1);
+        color: #38bdf8;
+        border-color: rgba(56, 189, 248, 0.3);
+        background: rgba(56, 189, 248, 0.05);
+    }
+
+    .res-laws-sm-h4 {
+        font-family: 'Outfit', sans-serif;
+        font-size: 1.375rem;
+        font-weight: 800;
+        color: #ffffff;
+        margin: 0;
+        transition: color 0.3s ease;
+        letter-spacing: -0.01em;
+    }
+
+    .res-laws-card:hover .res-laws-sm-h4 {
+        color: #38bdf8;
+    }
+
+    .res-laws-sm-p {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.9375rem;
+        color: #94a3b8;
+        line-height: 1.6;
+        margin: 0.5rem 0 0;
+    }
+
+    /* --------------------------------------------------------------------------
+   Section 03: Data Indexes
+   -------------------------------------------------------------------------- */
+    .res-data {
+        background: #f8fafc;
+    }
+
+    .res-data .res-sec-num {
+        color: rgba(15, 23, 42, 0.5);
+    }
+
+    .res-data .res-sec-h2 {
+        color: #0f172a;
+    }
+
+    .res-data .res-sec-p {
+        color: #6366f1;
+    }
+
+    .res-data .res-sec-line {
+        background: rgba(15, 23, 42, 0.08);
+    }
+
+    .res-data-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    @media (min-width: 768px) {
+        .res-data-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2.5rem;
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .res-data-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    .res-dt-card {
+        background: #ffffff;
+        border: 0.5px solid #65ea12;
+        border-radius: 5rem;
+        padding: 2.5rem;
+        text-decoration: none;
+        display: block;
+        transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.03);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .res-dt-card:hover {
+        border-color: rgba(99, 102, 241, 0.4);
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(99, 102, 241, 0.1), 0 0 0 1px rgba(99, 102, 241, 0.05);
+    }
+
+    .res-dt-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 2rem;
+    }
+
+    .res-dt-badge {
+        padding: 0.375rem 0.875rem;
+        background: rgba(99, 102, 241, 0.08);
+        border-radius: 9rem;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.6875rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        color: #4f46e5;
+        border: 1px solid rgba(99, 102, 241, 0.2);
+    }
+
+    .res-dt-arr {
+        color: #cbd5e1;
+        transition: all 0.4s ease;
+        width: 1.25rem;
+        height: 1.25rem;
+        transform: rotate(-45deg);
+    }
+
+    .res-dt-card:hover .res-dt-arr {
+        color: #6366f1;
+        transform: translate(5px, -5px) rotate(-45deg);
+    }
+
+    .res-dt-h4 {
+        font-family: 'Outfit', sans-serif;
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #7a3d1c;
+        margin: 0 0 1rem;
+        letter-spacing: -0.01em;
+    }
+
+   
+
+    .res-dt-p {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.9375rem;
+        font-weight: 400;
+        line-height: 1.7;
+        color: #64748b;
+        margin: 0;
+    }
+
+    .res-dt-feat {
+        background: linear-gradient(135deg, #0f172a, #020617);
+        border: 1px solid rgba(99, 102, 241, 0.3);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    }
+
+    .res-dt-feat:hover {
+        border-color: #6366f1;
+        box-shadow: 0 30px 60px rgba(99, 102, 241, 0.3);
+        transform: translateY(-8px);
+    }
+
+    .res-dt-feat-bg {
+        position: absolute;
+        right: -4rem;
+        bottom: -4rem;
+        width: 15rem;
+        height: 15rem;
+        background: radial-gradient(circle, rgba(99, 102, 241, 0.2) 0%, transparent 60%);
+        filter: blur(20px);
+        border-radius: 50%;
+        transition: transform 0.6s ease;
+        pointer-events: none;
+    }
+
+    .res-dt-feat:hover .res-dt-feat-bg {
+        transform: scale(1.5);
+    }
+
+    /* --------------------------------------------------------------------------
+   Section 04: Institutional Directory
+   -------------------------------------------------------------------------- */
+    .res-orgs {
+        background: transparent;
+        padding-bottom: 12rem;
+    }
+
+    .res-orgs .res-sec-line {
+        background: linear-gradient(to right, rgba(216, 216, 216, 0.9), transparent);
+    }
+
+    .res-org-container {
+        display: flex;
+        flex-direction: column;
+        gap: 6rem;
+    }
+
+    .res-org-group {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 3rem;
+    }
+
+    @media (min-width: 1024px) {
+        .res-org-group {
+            grid-template-columns: 320px 1fr;
+        }
+    }
+
+    /* --------------------------------------------------------------------------
+   Section 04: Institutional Directory (Refined Bento Layout)
+   -------------------------------------------------------------------------- */
+    .res-orgs {
+        background: transparent;
+        padding-bottom: 12rem;
+        background: rgb(143, 143, 143);
+    }
+
+    .res-orgs .res-sec-line {
+        background: rgba(214, 214, 214, 0.9) !important;
+    } 
+
+    .res-org-bento {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+
+    @media (min-width: 768px) {
+        .res-org-bento {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .res-org-bento {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+
+    .res-org-card {
+        background: #0f172a;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 1.75rem;
+        padding: 2rem;
+        text-decoration: none;
+        display: flex;
+        flex-direction: column;
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        background: #1e293b;
+        border-color: rgba(56, 189, 248, 0.4);
+        transform: translateY(-8px);
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+    }
+
+
+    .res-org-card.alt:hover {
+        border-color: rgba(217, 119, 6, 0.4);
+    }
+
+    .res-org-card-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.5rem;
+    }
+
+    .res-org-card-badge {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.625rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        padding: 0.35rem 0.75rem;
+        border-radius: 2rem;
+        background: rgba(56, 189, 248, 0.1);
+        color: #38bdf8;
+        border: 1px solid rgba(56, 189, 248, 0.2);
+    }
+
+    .res-org-card.alt .res-org-card-badge {
+        background: rgba(217, 119, 6, 0.1);
+        color: #d97706;
+        border-color: rgba(217, 119, 6, 0.2);
+    }
+
+    .res-org-card-ico {
+        color: rgba(255, 255, 255, 0.2);
+        transition: all 0.4s ease;
+    }
+
+    .res-org-card:hover .res-org-card-ico {
+        color: #38bdf8;
+        transform: rotate(-15deg) scale(1.1);
+    }
+
+    .res-org-card.alt:hover .res-org-card-ico {
+        color: #d97706;
+    }
+
+    .res-org-card-h4 {
+        font-family: 'Outfit', sans-serif;
+        font-size: 1.76rem !important;
+        font-weight: 700;
+        color: #42e003 !important;
+        margin: 0 0 0.75rem;
+        letter-spacing: -0.01em;
+    }
+
+    .res-org-card-p {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.875rem;
+        color: #ffffff !important;
+        line-height: 1.6;
+        margin: 0 0 2rem;
+        flex-grow: 1;
+    }
+
+    .res-org-card-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 1.25rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .res-org-card-link {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #64748b;
+        transition: color 0.3s ease;
+    }
+
+    .res-org-card:hover .res-org-card-link {
+        color: #ffffff;
+    }
+
+    .res-org-card-arr {
+        width: 1.5rem;
+        height: 1.5rem;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.03);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #64748b;
+        transition: all 0.3s ease;
+    }
+
+    .res-org-card:hover .res-org-card-arr {
+        background: #38bdf8;
+        color: #ffffff;
+        transform: translateX(3px);
+    }
+
+    .res-org-card.alt:hover .res-org-card-arr {
+        background: #d97706;
+    }
+
+
+    .res-org-card-h4 {
+        font-family: 'Outfit', sans-serif;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #ffffff;
+        margin: 0 0 0.75rem;
+        transition: color 0.3s ease;
+    }
+
+    .res-org-card:hover .res-org-card-h4 {
+        color: #38bdf8;
+    }
+
+    .res-org-card.alt:hover .res-org-card-h4 {
+        color: #d97706;
+    }
+
+    .res-org-card-p {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.875rem;
+        color: #64748b;
+        line-height: 1.6;
+        margin: 0 0 2rem;
+    }
+
+    .res-org-card-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 1.5rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .res-org-card-link {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #94a3b8;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: color 0.3s ease;
+    }
+
+    .res-org-card:hover .res-org-card-link {
+        color: #ffffff;
+    }
+
+    .res-org-card-btn {
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.05);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #94a3b8;
+        transition: all 0.3s ease;
+    }
+
+    .res-org-card:hover .res-org-card-btn {
+        background: #38bdf8;
+        color: #ffffff;
+        transform: rotate(-45deg);
+    }
+
+    .res-org-card.alt:hover .res-org-card-btn {
+        background: #d97706;
+    }
+
+    /* More Utility Classes */
+    .res-card-ico-white { background: #ffffff; color: #0A192F; border: 1px solid rgba(10,25,47,0.1); }
+    .res-dt-badge-feat { border: 1px solid rgba(255,255,255,0.2); }
+    .res-dt-arr-feat { color:#D97706; }
+    .res-dt-h4-feat { color: #ffffff; }
+    .res-no-deco { text-decoration: none; }
+    .res-text-accent { color: #5cfb00; }
+
+    /* Mobile: disable fixed background attachment (causes jank on iOS Safari) */
+    @media (max-width: 768px) {
+        .res-laws {
+            background-attachment: scroll;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="res-page">
+    <div class="res-bg">
+        <div class="res-bg-pattern"></div>
+        <div class="res-bg-glow-tr"></div>
+        <div class="res-bg-glow-bl"></div>
+    </div>
+
+    <!-- Header Section -->
+    <section class="res-hero" id="top">
+        <div class="res-hero-bg">
+            <img src="static/assets/resources-page/hero.jpg" alt="Governance Library">
+            <div class="res-hero-bg-overlay"></div>
+            <div class="res-hero-glow-main"></div>
+        </div>
+        <div class="res-hero-wrap">
+            <div class="res-hero-badge">
+                <span class="res-hero-badge-dot"></span>
+                <span class="res-hero-badge-txt">Global Repository</span>
+            </div>
+            <h1 class="res-hero-h1">Intelligence <br /><span>Directory</span></h1>
+            <p class="res-hero-p">
+                A curated ecosystem of analytical toolkits, legal frameworks, and empirical data sources. Engineered to
+                augment your institutional reform strategies.
+            </p>
+            
+        </div>
+    </section>
+
+    <!-- 01. Core Infrastructure -->
+    <section class="res-sec res-core" id="core">
+        <div class="res-sec-wrap">
+            <div class="res-sec-head">
+                <div class="res-sec-num">01</div>
+                <div class="res-sec-title-wrap">
+                    <h2 class="res-sec-h2">System Architecture</h2>
+                    <p class="res-sec-p">Foundational DSTAIR knowledge base.</p>
+                </div>
+                <div class="res-sec-line"></div>
+            </div>
+
+            <div class="res-core-grid">
+                <!-- Card 1 -->
+                <a href="/how-it-works" class="res-card-glass">
+                    <div class="res-card-glass-glow"></div>
+                    <div class="res-card-ico">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <circle cx="12" cy="12" r="10" />
+                            <circle cx="12" cy="12" r="4" />
+                            <line x1="21.17" y1="8" x2="12" y2="8" />
+                            <line x1="3.95" y1="6.06" x2="8.54" y2="14" />
+                            <line x1="10.88" y1="21.94" x2="15.46" y2="14" />
+                        </svg>
+                    </div>
+                    <h3 class="res-card-h3">More info on 'Spheres'</h3>
+                    <p class="res-card-p">Resources addressing each of the nine spheres of society to help understand
+                        the framework.</p>
+                    <div class="res-card-link">Understanding Spheres <svg width="14" height="14" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14" />
+                            <path d="m12 5 7 7-7 7" />
+                        </svg></div>
+                </a>
+                <!-- Card 2 -->
+                <a href="/analysis/3?tab=tools" class="res-card-special">
+                    <div class="res-card-sp-glow"></div>
+                    <div class="res-card-sp-ico">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path
+                                d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+                        </svg>
+                    </div>
+                    <h3 class="res-card-sp-h3">Tool Kits</h3>
+                    <p class="res-card-sp-p">A collection of policy solutions specifically designed for addressing and
+                        fixing weak institutions.</p>
+                    <div class="res-card-sp-link">Explore Toolkits <svg width="14" height="14" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14" />
+                            <path d="m12 5 7 7-7 7" />
+                        </svg></div>
+                </a>
+                <!-- Card 3 -->
+                <a href="/faq" class="res-card-glass">
+                    <div class="res-card-glass-glow"></div>
+                    <div class="res-card-ico res-card-ico-white">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <circle cx="12" cy="12" r="10" />
+                            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                            <line x1="12" y1="17" x2="12.01" y2="17" />
+                        </svg>
+                    </div>
+                    <h3 class="res-card-h3">FAQs & Glossary</h3>
+                    <p class="res-card-p">A comprehensive list of expert answers and term definitions provided by the
+                        tool developers.</p>
+                    <div class="res-card-link">Read Documentation <svg width="14" height="14" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14" />
+                            <path d="m12 5 7 7-7 7" />
+                        </svg></div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 02. Laws & Treaties -->
+    <section class="res-sec res-laws" id="laws">
+        <div class="res-sec-wrap">
+            <div class="res-sec-head">
+                <div class="res-sec-num">02</div>
+                <div class="res-sec-title-wrap">
+                    <h2 class="res-sec-h2">Legal Frameworks & Treaties</h2>
+                    <p class="res-sec-p">International anti-corruption mandates.</p>
+                </div>
+                <div class="res-sec-line"></div>
+            </div>
+
+            <div class="res-laws-grid">
+                <!-- Large Feature -->
+                <div class="res-laws-card res-laws-card-lg">
+                    <div class="res-laws-flex">
+                        <div class="res-laws-f-left">
+                            <span class="res-laws-badge">Global Standard</span>
+                            <h3 class="res-laws-lg-h3"> <span class="res-text-accent">UN Convention Against Corruption </span></h3>
+                            <p class="res-laws-lg-p">The first legally binding international anti-corruption instrument,
+                                addressing preventative measures, criminalization, and asset recovery.</p>
+                            <a href="https://www.unodc.org/unodc/en/treaties/CAC/" target="_blank"
+                                class="res-laws-link">View Full Text &rarr;</a>
+                        </div>
+                        <div class="res-laws-f-right">
+                            <span class="res-laws-fr-num">123</span>
+                            <span class="res-laws-fr-lbl">Signatory Nations</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Secondary -->
+                <a href="http://www.oecd.org/department/0,2688,en_2649_34855_1_1_1_1_1,00.html" target="_blank"
+                    class="res-laws-card res-laws-card-md res-no-deco">
+                    <div class="res-laws-md-ico">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                        </svg>
+                    </div>
+                    <h3 class="res-laws-md-h3"><span class="res-text-accent">OECD Anti-Bribery Convention</span></h3>
+                    <p class="res-laws-md-p">Criminalizes the offering of bribes to foreign officials to secure
+                        international business deals.</p>
+                    <div class="res-laws-md-link">Explore Treaty</div>
+                </a>
+
+                <!-- Small Features -->
+                <a href="#" class="res-laws-card res-laws-card-sm res-no-deco">
+                    <div class="res-laws-sm-ico">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.5">
+                            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="res-laws-sm-h4">World Bank Reforms</h4>
+                        <p class="res-laws-sm-p">Suggested legislative changes focusing on institutional integrity.</p>
+                    </div>
+                </a>
+
+                <a href="https://digitallibrary.un.org/record/233080?ln=en" target="_blank"
+                    class="res-laws-card res-laws-card-sm res-no-deco">
+                    <div class="res-laws-sm-ico">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.5">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                            <polyline points="14 2 14 8 20 8" />
+                            <line x1="16" y1="13" x2="8" y2="13" />
+                            <line x1="16" y1="17" x2="8" y2="17" />
+                            <polyline points="10 9 9 9 8 9" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 class="res-laws-sm-h4">UN Declaration (Bribery)</h4>
+                        <p class="res-laws-sm-p">Commercial transaction anti-bribery and ethical standards.</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 03. Indexes & Surveys -->
+    <section class="res-sec res-data" id="data">
+        <div class="res-sec-wrap">
+            <div class="res-sec-head">
+                <div class="res-sec-num">03</div>
+                <div class="res-sec-title-wrap">
+                    <h2 class="res-sec-h2">Data Indexes & Surveys</h2>
+                    <p class="res-sec-p">Empirical metrics for global institutional health.</p>
+                </div>
+                <div class="res-sec-line"></div>
+            </div>
+
+            <div class="res-data-grid">
+                <!-- Items -->
+                <a href="https://www.transparency.org/en/cpi/2019/nzl" target="_blank" class="res-dt-card">
+                    <div class="res-dt-top">
+                        <span class="res-dt-badge">Transparency Int.</span>
+                        <svg class="res-dt-arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                            <polyline points="12 5 19 12 12 19" />
+                        </svg>
+                    </div>
+                    <h4 class="res-dt-h4">Corruption Perception Index</h4>
+                    <p class="res-dt-p">Measures perceived levels of public sector corruption across 145 countries based
+                        on expert assessments.</p>
+                </a>
+                <a href="https://www.transparency.org/en/publications/gcb-2004" target="_blank" class="res-dt-card">
+                    <div class="res-dt-top">
+                        <span class="res-dt-badge">Transparency Int.</span>
+                        <svg class="res-dt-arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                            <polyline points="12 5 19 12 12 19" />
+                        </svg>
+                    </div>
+                    <h4 class="res-dt-h4">Global Corruption Barometer</h4>
+                    <p class="res-dt-p">A survey of the general public in 64 countries regarding their direct
+                        experiences with corruption.</p>
+                </a>
+                <a href="http://info.worldbank.org/governance/wgi/" target="_blank" class="res-dt-card">
+                    <div class="res-dt-top">
+                        <span class="res-dt-badge">World Bank</span>
+                        <svg class="res-dt-arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                            <polyline points="12 5 19 12 12 19" />
+                        </svg>
+                    </div>
+                    <h4 class="res-dt-h4">Governance Indicators</h4>
+                    <p class="res-dt-p">Aggregate data covering stability, rule of law, and government effectiveness
+                        across over 200 states.</p>
+                </a>
+                <a href="https://www.transparency.org/en/press-release/bribe-payers-index-2011" target="_blank"
+                    class="res-dt-card">
+                    <div class="res-dt-top">
+                        <span class="res-dt-badge">Transparency Int.</span>
+                        <svg class="res-dt-arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                            <polyline points="12 5 19 12 12 19" />
+                        </svg>
+                    </div>
+                    <h4 class="res-dt-h4">Bribe Payers Survey</h4>
+                    <p class="res-dt-p">An analysis of the propensity of companies from developed nations to pay bribes
+                        when operating abroad.</p>
+                </a>
+                <a href="https://freedomhouse.org/reports/countries-crossroads" target="_blank" class="res-dt-card">
+                    <div class="res-dt-top">
+                        <span class="res-dt-badge">Freedom House</span>
+                        <svg class="res-dt-arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                            <polyline points="12 5 19 12 12 19" />
+                        </svg>
+                    </div>
+                    <h4 class="res-dt-h4">Countries at the Crossroads</h4>
+                    <p class="res-dt-p">Performance evaluations of 30 strategic countries currently undergoing
+                        democratic transitions.</p>
+                </a>
+                <a href="https://www.globalintegrity.org" target="_blank" class="res-dt-card">
+                    <div class="res-dt-top">
+                        <span class="res-dt-badge">Global Integrity</span>
+                        <svg class="res-dt-arr" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                            <polyline points="12 5 19 12 12 19" />
+                        </svg>
+                    </div>
+                    <h4 class="res-dt-h4">Global Integrity Report</h4>
+                    <p class="res-dt-p">Detailed analysis of how well citizens can ensure accountable and open
+                        governance.</p>
+                </a>
+                <a href="http://lcweb2.loc.gov/frd/cs/cshome.html" target="_blank" class="res-dt-card res-dt-feat">
+                    <div class="res-dt-feat-bg"></div>
+                    <div class="res-dt-top">
+                        <span class="res-dt-badge res-dt-badge-feat">Country Lore</span>
+                        <svg class="res-dt-arr res-dt-arr-feat" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                            <polyline points="12 5 19 12 12 19" />
+                        </svg>
+                    </div>
+                    <h4 class="res-dt-h4 res-dt-h4-feat">Regional Research</h4>
+                    <p class="res-dt-p">Library of Congress and BBC regional snapped profiles for historical and
+                        political context.</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- 04. Institutional Directory -->
+    <section class="res-sec res-orgs" id="orgs">
+        <div class="res-sec-wrap">
+            <div class="res-sec-head">
+                <div class="res-sec-num" style="color: #ffffff !important;">04</div>
+                <div class="res-sec-title-wrap">
+                    <h2 class="res-sec-h2" style="color: #000000 !important;">Institutional Directory</h2>
+                    <p class="res-sec-p" style="color: #000000 !important;">Global integrity stakeholders.</p>
+                </div>
+                <div class="res-sec-line"></div>
+            </div>
+
+            <div class="res-org-bento">
+                <!-- IGOs -->
+                <a href="https://www.oecd.org/corruption-integrity/" target="_blank" class="res-org-card">
+                    <div class="res-org-card-head">
+                        <span class="res-org-card-badge">Intergovernmental</span>
+                        <div class="res-org-card-ico">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                        </div>
+                    </div>
+                    <h4 class="res-org-card-h4">OECD Anti-Corruption</h4>
+                    <p class="res-org-card-p">Global leader in bribery prevention and public-private sector integrity standards.</p>
+                    <div class="res-org-card-footer">
+                        <span class="res-org-card-link">Visit Portal</span>
+                        <div class="res-org-card-arr">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="https://www.interpol.int/Crimes/Corruption" target="_blank" class="res-org-card">
+                    <div class="res-org-card-head">
+                        <span class="res-org-card-badge">Law Enforcement</span>
+                        <div class="res-org-card-ico">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        </div>
+                    </div>
+                    <h4 class="res-org-card-h4">Interpol Expert Group</h4>
+                    <p class="res-org-card-p">Coordinating global efforts to dismantle complex corruption and financial crime networks.</p>
+                    <div class="res-org-card-footer">
+                        <span class="res-org-card-link">Criminal Intelligence</span>
+                        <div class="res-org-card-arr">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="https://www.unodc.org/unodc/en/corruption/index.html" target="_blank" class="res-org-card">
+                    <div class="res-org-card-head">
+                        <span class="res-org-card-badge">United Nations</span>
+                        <div class="res-org-card-ico">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                        </div>
+                    </div>
+                    <h4 class="res-org-card-h4">UNODC Corruption</h4>
+                    <p class="res-org-card-p">Guardian of the UNCAC, providing technical assistance and policy support to member states.</p>
+                    <div class="res-org-card-footer">
+                        <span class="res-org-card-link">Technical Support</span>
+                        <div class="res-org-card-arr">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- NGOs -->
+                <a href="https://publicintegrity.org" target="_blank" class="res-org-card alt">
+                    <div class="res-org-card-head">
+                        <span class="res-org-card-badge">Civil Society</span>
+                        <div class="res-org-card-ico">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+                        </div>
+                    </div>
+                    <h4 class="res-org-card-h4">Public Integrity</h4>
+                    <p class="res-org-card-p">Investigative newsroom exposing the influence of money and power on global democracy.</p>
+                    <div class="res-org-card-footer">
+                        <span class="res-org-card-link">Investigations</span>
+                        <div class="res-org-card-arr">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="http://www.transparency.org" target="_blank" class="res-org-card alt">
+                    <div class="res-org-card-head">
+                        <span class="res-org-card-badge">Global Coalition</span>
+                        <div class="res-org-card-ico">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        </div>
+                    </div>
+                    <h4 class="res-org-card-h4">Transparency Int.</h4>
+                    <p class="res-org-card-p">The definitive global voice against corruption, tracking transparency and integrity trends.</p>
+                    <div class="res-org-card-footer">
+                        <span class="res-org-card-link">Anti-Corruption Hub</span>
+                        <div class="res-org-card-arr">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="https://www.u4.no" target="_blank" class="res-org-card alt">
+                    <div class="res-org-card-head">
+                        <span class="res-org-card-badge">Research Center</span>
+                        <div class="res-org-card-ico">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+                        </div>
+                    </div>
+                    <h4 class="res-org-card-h4">U4 Anti-Corruption</h4>
+                    <p class="res-org-card-p">Leading resource center providing evidence-based research for development practitioners.</p>
+                    <div class="res-org-card-footer">
+                        <span class="res-org-card-link">Knowledge Base</span>
+                        <div class="res-org-card-arr">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="https://apps.who.int/iris/discover?query=anti+corruption" target="_blank" class="res-org-card alt">
+                    <div class="res-org-card-head">
+                        <span class="res-org-card-badge">Health Systems</span>
+                        <div class="res-org-card-ico">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                        </div>
+                    </div>
+                    <h4 class="res-org-card-h4">IRIS Resources</h4>
+                    <p class="res-org-card-p">WHO's digital library focusing on corruption and integrity challenges in healthcare.</p>
+                    <div class="res-org-card-footer">
+                        <span class="res-org-card-link">Search IRIS</span>
+                        <div class="res-org-card-arr">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="https://eldis.org/organisation/A6542" target="_blank" class="res-org-card alt">
+                    <div class="res-org-card-head">
+                        <span class="res-org-card-badge">Data Archive</span>
+                        <div class="res-org-card-ico">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        </div>
+                    </div>
+                    <h4 class="res-org-card-h4">TI-CORIS</h4>
+                    <p class="res-org-card-p">A vast digital repository of online research and information on institutional reform.</p>
+                    <div class="res-org-card-footer">
+                        <span class="res-org-card-link">Data Archive</span>
+                        <div class="res-org-card-arr">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="https://scholar.google.com/scholar?q=anti-corruption+institutional+reform" target="_blank" class="res-org-card alt">
+                    <div class="res-org-card-head">
+                        <span class="res-org-card-badge">Academic Search</span>
+                        <div class="res-org-card-ico">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        </div>
+                    </div>
+                    <h4 class="res-org-card-h4">Google Scholar</h4>
+                    <p class="res-org-card-p">Access to peer-reviewed academic research on anti-corruption and institutional change.</p>
+                    <div class="res-org-card-footer">
+                        <span class="res-org-card-link">Search Research</span>
+                        <div class="res-org-card-arr">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="https://nathanson.osgoode.yorku.ca" target="_blank" class="res-org-card alt">
+                    <div class="res-org-card-head">
+                        <span class="res-org-card-badge">Crime & Security</span>
+                        <div class="res-org-card-ico">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        </div>
+                    </div>
+                    <h4 class="res-org-card-h4">Nathanson Center</h4>
+                    <p class="res-org-card-p">Specialized research on the intersection of transnational crime, corruption, and security.</p>
+                    <div class="res-org-card-footer">
+                        <span class="res-org-card-link">View Research</span>
+                        <div class="res-org-card-arr">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

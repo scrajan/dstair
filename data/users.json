@@ -1,0 +1,242 @@
+[
+    {
+        "name": "Admin",
+        "username": "admin_root",
+        "password": "Dst@!r_Adm1n#2026",
+        "role": "admin"
+    },
+    {
+        "name": "Sarah Mitchell",
+        "username": "sarah.mitchell",
+        "password": "P@rameter$_An4lyst!",
+        "role": "user"
+    },
+    {
+        "name": "James Chen",
+        "username": "james.chen",
+        "password": "Inst!tut10n_Rev#w3r",
+        "role": "user"
+    },
+    {
+        "name": "Priya Sharma",
+        "username": "priya.sharma",
+        "password": "Gl0bal_G0v#Study!9",
+        "role": "user"
+    },
+    {
+        "name": "Marcus Okafor",
+        "username": "marcus.okafor",
+        "password": "Ref0rm_Tr@ck3r!27",
+        "role": "user"
+    },
+    {
+        "name": "Elena Vasquez",
+        "username": "elena.vasquez",
+        "password": "P0l1cy_D@ta#Exp!t",
+        "role": "user"
+    },
+    {
+        "name": "AI Evaluator",
+        "username": "ai_evaluator",
+        "password": "A1_Ev@lu@t0r#Sys!2026",
+        "role": "ai"
+    },
+    {
+        "name": "default",
+        "username": "default",
+        "password": "def@ult",
+        "role": "user"
+    },
+    {
+        "name": "reset",
+        "username": "reset",
+        "password": "r%set",
+        "role": "user"
+    },
+    {
+        "name": "Chella Rajan",
+        "username": "crajan",
+        "password": "cr@jan",
+        "role": "user"
+    },
+    {
+        "name": "Guest",
+        "username": "guest",
+        "password": "guest",
+        "role": "user"
+    },
+    {
+        "name": "Jeff Rosenblum",
+        "username": "jeff",
+        "password": "jeff",
+        "role": "user"
+    },
+    {
+        "name": "Richard Rose",
+        "username": "rrose",
+        "password": "rr@se",
+        "role": "user"
+    },
+    {
+        "name": "Myles Smith",
+        "username": "mgsmith",
+        "password": "mgsm%th",
+        "role": "user"
+    },
+    {
+        "name": "Anti-Corr",
+        "username": "ancorr",
+        "password": "@ncorr",
+        "role": "user"
+    },
+    {
+        "name": "INL State",
+        "username": "inlstate",
+        "password": "inlst@te",
+        "role": "user"
+    },
+    {
+        "name": "US AID",
+        "username": "usaid",
+        "password": "us@id",
+        "role": "user"
+    },
+    {
+        "name": "test",
+        "username": "test",
+        "password": "test",
+        "role": "user"
+    },
+    {
+        "name": "Pablo Zoido",
+        "username": "pzoido",
+        "password": "pz@ido",
+        "role": "user"
+    },
+    {
+        "name": "World Bank Institute",
+        "username": "wbank",
+        "password": "wb@nk",
+        "role": "user"
+    },
+    {
+        "name": "Danielle S. Parsons",
+        "username": "dsparsons",
+        "password": "dsp@rsons",
+        "role": "user"
+    },
+    {
+        "name": "Marie Wolkers (TI)",
+        "username": "mwolkers",
+        "password": "mw@lkers",
+        "role": "user"
+    },
+    {
+        "name": "Country Risk",
+        "username": "crisk",
+        "password": "cr%sk",
+        "role": "user"
+    },
+    {
+        "name": "Yahoo Directory",
+        "username": "Yahoo",
+        "password": "Y@hoo",
+        "role": "user"
+    },
+    {
+        "name": "Taras Krupskyy",
+        "username": "taras",
+        "password": "t@ras",
+        "role": "user"
+    },
+    {
+        "name": "Tarun Philip",
+        "username": "tarun",
+        "password": "t@run",
+        "role": "user"
+    },
+    {
+        "name": "Dr. Avilash Roul",
+        "username": "Avilash",
+        "password": "@vil@sh@32",
+        "role": "user"
+    },
+    {
+        "name": "V-Dem",
+        "username": "v-dem",
+        "password": "v@dem",
+        "role": "user"
+    },
+    {
+        "name": "Center for Public Integrity",
+        "username": "cpint",
+        "password": "cp%nt",
+        "role": "user"
+    },
+    {
+        "name": "Dr. Brigitte Seim",
+        "username": "brigitte",
+        "password": "brigitt@",
+        "role": "user"
+    },
+    {
+        "name": "Tec Monterrey",
+        "username": "tecmx",
+        "password": "t@cmx",
+        "role": "user"
+    },
+    {
+        "name": "Group1 HS5580",
+        "username": "Group1",
+        "password": "Gr@up1",
+        "role": "user"
+    },
+    {
+        "name": "Group2 HS5580",
+        "username": "Group2",
+        "password": "Gr@up2",
+        "role": "user"
+    },
+    {
+        "name": "Group3 HS5580",
+        "username": "Group3",
+        "password": "Gr@up3",
+        "role": "user"
+    },
+    {
+        "name": "Group4 HS5580",
+        "username": "Group4",
+        "password": "Gr@up4",
+        "role": "user"
+    },
+    {
+        "name": "Group5 HS5580",
+        "username": "Group5",
+        "password": "Gr@up5",
+        "role": "user"
+    },
+    {
+        "name": "Group6 HS5580",
+        "username": "Group6",
+        "password": "Gr@up6",
+        "role": "user"
+    },
+    {
+        "name": "Group7 HS5580",
+        "username": "Group7",
+        "password": "Gr@up7",
+        "role": "user"
+    },
+    {
+        "name": "Group8 HS5580",
+        "username": "Group8",
+        "password": "Gr@up8",
+        "role": "user"
+    },
+    {
+        "name": "Group9 HS5580",
+        "username": "Group9",
+        "password": "Gr@up9",
+        "role": "user"
+    }
+]

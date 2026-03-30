@@ -1,0 +1,1110 @@
+{% extends 'base.html' %}
+
+{% block title %}Methodology | DSTAIR{% endblock %}
+
+{% block extra_css %}
+<!-- 
+  =============================================================================
+  PAGE-SPECIFIC STYLES (how_it_works.html)
+  =============================================================================
+  Unique Scoped CSS refactoring pattern. Every structural, layout, and visual 
+  component on this page is governed by its own bespoke, isolated CSS class. 
+  Zero style repetition from other pages.
+  =============================================================================
+-->
+<style>
+    /* Base Reset & Variables for this scope */
+    .hiw-page {
+        background: #020617;
+        overflow-x: hidden;
+    }
+
+    /* Background Enhancements */
+    .hiw-bg {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+        background: radial-gradient(circle at 20% 30%, rgba(16, 185, 129, 0.04), transparent 50%),
+            radial-gradient(circle at 80% 70%, rgba(217, 119, 6, 0.04), transparent 50%),
+            #020617;
+    }
+
+    .hiw-bg-pattern {
+        position: absolute;
+        inset: 0;
+        opacity: 0.12;
+        background-image:
+            linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+        background-size: 60px 60px;
+        mask: radial-gradient(circle at center, black 30%, transparent 80%);
+        -webkit-mask-image: radial-gradient(circle at center, black 30%, transparent 80%);
+    }
+
+    .hiw-bg-glow-tr {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 50vw;
+        height: 50vw;
+        background: rgba(16, 185, 129, 0.06);
+        filter: blur(150px);
+        border-radius: 50%;
+        transform: translate(50%, -50%);
+    }
+
+    .hiw-bg-glow-bl {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 50vw;
+        height: 50vw;
+        background: rgba(217, 119, 6, 0.06);
+        filter: blur(150px);
+        border-radius: 50%;
+        transform: translate(-50%, 50%);
+    }
+
+    /* --------------------------------------------------------------------------
+   Section 1: Hero
+   -------------------------------------------------------------------------- */
+    @keyframes hiw-hero-glow-pulse {
+
+        0%,
+        100% {
+            opacity: 0.6;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: 1;
+            transform: scale(1.08);
+        }
+    }
+
+    .hiw-hero {
+        position: relative;
+        z-index: 2;
+        padding: 5rem 1.5rem !important;
+        background: linear-gradient(rgba(15, 23, 42, 0.7), rgba(2, 6, 23, 0.8)),
+            url('/static/assets/how-it-work/hero.jpg');
+        background-attachment: fixed;
+        background-size: cover;
+        background-position: center;
+        overflow: hidden;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    @media (min-width: 768px) {
+        .hiw-hero {
+            padding: 10rem 4rem 4rem !important;
+        }
+    }
+
+    .hiw-hero-bg-glow {
+        position: absolute;
+        top: -20%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90vw;
+        height: 80vh;
+        background: radial-gradient(ellipse at center, rgba(16, 185, 129, 0.15) 0%, rgba(2, 6, 23, 0) 65%);
+        filter: blur(60px);
+        pointer-events: none;
+        animation: hiw-hero-glow-pulse 12s ease-in-out infinite;
+    }
+
+    .hiw-hero-bg-glow-2 {
+        position: absolute;
+        bottom: -10%;
+        right: -15%;
+        width: 60vw;
+        height: 60vw;
+        background: radial-gradient(circle, rgba(217, 119, 6, 0.1) 0%, transparent 70%);
+        filter: blur(100px);
+        pointer-events: none;
+        animation: hiw-hero-glow-pulse 9s ease-in-out infinite reverse;
+    }
+
+    .hiw-hero-dots {
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+        background-size: 28px 28px;
+        mask-image: radial-gradient(ellipse at 50% 40%, black 30%, transparent 75%);
+        -webkit-mask-image: radial-gradient(ellipse at 50% 40%, black 30%, transparent 75%);
+        mask: radial-gradient(ellipse at 50% 40%, black 30%, transparent 75%);
+        opacity: 0.5;
+    }
+
+    .hiw-hero-wrap {
+        max-width: 900px;
+        margin: 0 auto;
+        text-align: left;
+        position: relative;
+        z-index: 5;
+    }
+
+    .hiw-hero-sup {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.35em;
+        color: #10b981;
+        margin-bottom: 2.5rem;
+        padding: 0.5rem 1.25rem;
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        border-radius: 2rem;
+        background: rgba(16, 185, 129, 0.05);
+        backdrop-filter: blur(4px);
+    }
+
+    .hiw-hero-sup::before {
+        content: '';
+        display: block;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #10b981;
+        box-shadow: 0 0 8px #10b981;
+    }
+
+    .hiw-hero-h1 {
+        font-family: 'Outfit', sans-serif;
+        font-size: clamp(3rem, 7vw, 6.5rem);
+        font-weight: 900;
+        color: #ffffff;
+        margin: 0 0 3rem 0;
+        line-height: 0.92;
+        letter-spacing: -0.04em;
+    }
+
+    .hiw-hero-h1 span {
+        background: linear-gradient(135deg, #34d399 0%, #10b981 50%, #059669 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .hiw-hero-p {
+        font-family: 'Inter', sans-serif;
+        font-size: 1.25rem;
+        line-height: 1.9;
+        color: #94a3b8;
+        font-weight: 400;
+        margin: 0;
+        max-width: 720px;
+        border-left: 3px solid rgba(16, 185, 129, 0.5);
+        padding-left: 1.75rem;
+    }
+
+    /* --------------------------------------------------------------------------
+   Section 2: Nine Spheres Grid
+   -------------------------------------------------------------------------- */
+    .hiw-spheres {
+        position: relative;
+        z-index: 2;
+        padding: 10rem 1.5rem 10rem;
+        background: #f8fafc;
+        overflow: hidden;
+        border-top: 5px solid #10b981;
+    }
+
+    .hiw-spheres::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image:
+            linear-gradient(rgba(15, 23, 42, 0.02) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(15, 23, 42, 0.02) 1px, transparent 1px);
+        background-size: 52px 52px;
+        pointer-events: none;
+    }
+
+    @media (min-width: 768px) {
+        .hiw-spheres {
+            padding: 5rem 3rem 5rem;
+        }
+    }
+
+    .hiw-spheres-head {
+        max-width: 1500px;
+        margin: 0 auto 4rem;
+        text-align: center;
+        position: relative;
+        z-index: 2;
+    }
+
+    .hiw-spheres-sup {
+        display: inline-block;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.35em;
+        color: #10b981;
+        margin-bottom: 1.5rem;
+    }
+
+    .hiw-spheres-h2 {
+        font-family: 'Outfit', sans-serif;
+        font-size: clamp(4rem, 6vw, 6rem);
+        font-weight: 900;
+        color: #0f172a;
+        max-width: 900px;
+        margin: 0 auto;
+        letter-spacing: -0.03em;
+        line-height: 1.0;
+    }
+
+    .hiw-sph-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 2;
+    }
+
+    @media (min-width: 768px) {
+        .hiw-sph-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .hiw-sph-grid {
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 2.5rem;
+        }
+    }
+
+    .hiw-sph-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 5rem;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 10px 40px rgba(15, 23, 42, 0.03);
+        transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        position: relative;
+        border-color: rgba(16, 185, 129, 0.5);
+        transform: translateY(-10px);
+        box-shadow: 0 30px 70px rgba(16, 185, 129, 0.12), 0 0 0 1px rgba(16, 185, 129, 0.1);
+    }
+
+
+    .hiw-sph-img-wrap {
+        height: 14rem;
+        position: relative;
+        background: #0f172a;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+
+    .hiw-sph-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        filter: saturate(0.8) brightness(1.2);
+    }
+
+    
+
+    .hiw-sph-img-grad {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, #0f172a 0%, rgba(15, 23, 42, 0.5) 55%, transparent 100%);
+    }
+
+    .hiw-sph-ico {
+        position: absolute;
+        bottom: 1.25rem;
+        left: 1.5rem;
+        width: 3.25rem;
+        height: 3.25rem;
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-radius: 1rem;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .hiw-sph-ico svg {
+        width: 1.25rem;
+        height: 1.25rem;
+    }
+
+    .hiw-sph-card:hover .hiw-sph-ico {
+        background: #10b981;
+        border-color: #10b981;
+        transform: scale(1.15) rotate(-5deg);
+        box-shadow: 0 12px 30px rgba(16, 185, 129, 0.4);
+    }
+
+    .hiw-sph-body {
+        padding: 2.25rem 2.5rem 2.75rem;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        background: #ffffff;
+        border-top: 1px solid #f1f5f9;
+    }
+
+    .hiw-sph-h3 {
+        font-family: 'Outfit', sans-serif;
+        font-size: 1.625rem;
+        font-weight: 800;
+        color: #0f172a;
+        margin: 0 0 1rem 0;
+        letter-spacing: -0.02em;
+    }
+
+    .hiw-sph-p {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.9375rem;
+        color: #64748b;
+        line-height: 1.8;
+        font-weight: 400;
+        margin: 0;
+        flex-grow: 1;
+    }
+
+    /* --------------------------------------------------------------------------
+   Section 3: Timeline Process
+   -------------------------------------------------------------------------- */
+    @keyframes hiw-time-glow-shift {
+
+        0%,
+        100% {
+            transform: translate(30%, -30%) scale(1);
+            opacity: 0.8;
+        }
+
+        50% {
+            transform: translate(25%, -25%) scale(1.1);
+            opacity: 1;
+        }
+    }
+
+    .hiw-time {
+        position: relative;
+        z-index: 2;
+        margin: 0;
+        background: linear-gradient(160deg, #0d1829 0%, #0f172a 50%, #020617 100%);
+        padding: 4rem 1.5rem 4rem;
+        overflow: hidden;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    @media (min-width: 768px) {
+        .hiw-time {
+            padding: 4rem 4rem 4rem;
+        }
+    }
+
+    .hiw-time-bg {
+        position: absolute;
+        inset: 0;
+        opacity: 0.025;
+        background-image:
+            linear-gradient(rgba(255, 255, 255, 0.5) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.5) 1px, transparent 1px);
+        background-size: 40px 40px;
+        pointer-events: none;
+    }
+
+    .hiw-time-glow-tr {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 700px;
+        height: 700px;
+        background: radial-gradient(circle, rgba(217, 119, 6, 0.2) 0%, transparent 65%);
+        filter: blur(100px);
+        border-radius: 50%;
+        transform: translate(30%, -30%);
+        pointer-events: none;
+        animation: hiw-time-glow-shift 15s ease-in-out infinite;
+    }
+
+    .hiw-time-glow-bl {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 700px;
+        height: 700px;
+        background: radial-gradient(circle, rgba(16, 185, 129, 0.14) 0%, transparent 65%);
+        filter: blur(100px);
+        border-radius: 50%;
+        transform: translate(-30%, 30%);
+        pointer-events: none;
+        animation: hiw-time-glow-shift 18s ease-in-out infinite reverse;
+    }
+
+    .hiw-time-head {
+        max-width: 1000px;
+        margin: 0 auto 9rem;
+        text-align: center;
+        position: relative;
+        z-index: 10;
+    }
+
+    .hiw-time-h2-sup {
+        display: inline-block;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.35em;
+        color: #d97706;
+        margin-bottom: 2rem;
+        padding: 0.5rem 1.25rem;
+        border: 1px solid rgba(217, 119, 6, 0.3);
+        border-radius: 2rem;
+        background: rgba(217, 119, 6, 0.05);
+    }
+
+    .hiw-time-h2 {
+        font-family: 'Outfit', sans-serif;
+        font-size: clamp(2.5rem, 5vw, 5rem);
+        font-weight: 900;
+        color: #ffffff;
+        margin: 0;
+        letter-spacing: -0.04em;
+        line-height: 0.95;
+        text-shadow: none;
+    }
+
+    .hiw-time-line-small {
+        width: 5rem;
+        height: 3px;
+        background: linear-gradient(90deg, #d97706, rgba(217, 119, 6, 0));
+        margin: 2.5rem auto 0;
+        border-radius: 9999px;
+    }
+
+    .hiw-time-wrap {
+        max-width: 1100px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 10;
+    }
+
+    .hiw-time-vline {
+        display: none;
+    }
+
+    @media (min-width: 768px) {
+        .hiw-time-vline {
+            display: block;
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 2rem;
+            width: 1px;
+            background: linear-gradient(to bottom, rgba(255, 255, 255, 0.0), rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.0));
+            transform: translateX(-50%);
+            z-index: 1;
+        }
+    }
+
+    .hiw-time-steps {
+        display: flex;
+        flex-direction: column;
+        gap: 10rem;
+        position: relative;
+        z-index: 5;
+    }
+
+    .hiw-ts-row {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3rem;
+        position: relative;
+    }
+
+    @media (min-width: 768px) {
+        .hiw-ts-row {
+            flex-direction: row;
+            justify-content: space-between;
+            gap: 0;
+        }
+
+        .hiw-ts-row.rev {
+            flex-direction: row-reverse;
+        }
+    }
+
+    .hiw-ts-img-col {
+        width: 100%;
+    }
+
+    @media (min-width: 768px) {
+        .hiw-ts-img-col {
+            width: 44%;
+        }
+
+        .hiw-ts-img-col.left {
+            text-align: right;
+        }
+
+        .hiw-ts-img-col.right {
+            text-align: left;
+        }
+    }
+
+    .hiw-ts-img {
+        width: 100%;
+        max-width: 440px;
+        border-radius: 2.5rem;
+        box-shadow: 0 30px 70px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.07);
+        transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        display: inline-block;
+        /* filter: saturate(1); */
+        border: none;
+    }
+
+
+
+    .hiw-ts-badge {
+        display: none;
+    }
+
+    @media (min-width: 768px) {
+        .hiw-ts-badge {
+            display: flex;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 5rem;
+            height: 5rem;
+            background: #020617;
+            border: 2px solid #d97706;
+            border-radius: 50%;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.75rem;
+            font-weight: 900;
+            color: #d97706;
+            box-shadow: 0 0 30px rgba(217, 119, 6, 0.3), 0 0 0 8px rgba(217, 119, 6, 0.06);
+            z-index: 10;
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+    }
+
+    .hiw-ts-txt-col {
+        width: 100%;
+    }
+
+    @media (min-width: 768px) {
+        .hiw-ts-txt-col {
+            width: 44%;
+        }
+
+        .hiw-ts-txt-col.left {
+            text-align: left;
+        }
+
+        .hiw-ts-txt-col.right {
+            text-align: right;
+        }
+    }
+
+    .hiw-ts-sup {
+        font-family: 'Inter', sans-serif;
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.35em;
+        color: #d97706;
+        margin-bottom: 1.25rem;
+        display: block;
+    }
+
+    .hiw-ts-h3 {
+        font-family: 'Outfit', sans-serif;
+        font-size: clamp(2rem, 4vw, 3.25rem);
+        font-weight: 900;
+        color: #ffffff;
+        margin: 0 0 2rem 0;
+        letter-spacing: -0.04em;
+        line-height: 0.95;
+    }
+
+    .hiw-ts-p {
+        font-family: 'Inter', sans-serif;
+        font-size: 1.125rem;
+        line-height: 1.9;
+        color: #94a3b8;
+        font-weight: 400;
+        margin: 0;
+    }
+
+    .hiw-ts-box {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        padding: 2.25rem;
+        border-radius: 2rem;
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        margin-top: 2.5rem;
+        display: inline-block;
+        width: 100%;
+        transition: all 0.5s ease;
+    }
+
+    .hiw-ts-row:hover .hiw-ts-box {
+        border-color: rgba(217, 119, 6, 0.2);
+        background: rgba(217, 119, 6, 0.04);
+    }
+
+    @media (min-width: 768px) {
+        .hiw-ts-txt-col.right .hiw-ts-box {
+            text-align: left;
+        }
+    }
+
+    .hiw-ts-box-sup {
+        display: block;
+        color: #fde68a;
+        font-family: 'Inter', sans-serif;
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.25em;
+        margin-bottom: 1.5rem;
+    }
+
+    .hiw-ts-box ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.875rem;
+    }
+
+    .hiw-ts-box li {
+        font-family: 'Inter', sans-serif;
+        font-size: 1rem;
+        font-weight: 400;
+        color: #cbd5e1;
+        position: relative;
+        padding-left: 1.5rem;
+        line-height: 1.6;
+    }
+
+    .hiw-ts-box li::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0.6rem;
+        width: 0.5rem;
+        height: 0.5rem;
+        border-radius: 50%;
+        background: #d97706;
+        box-shadow: 0 0 8px rgba(217, 119, 6, 0.5);
+    }
+
+    .hiw-ts-box p {
+        font-family: 'Inter', sans-serif;
+        font-size: 1rem;
+        font-style: italic;
+        color: #cbd5e1;
+        line-height: 1.8;
+        margin: 0;
+    }
+
+    @media (min-width: 768px) {
+        .hiw-ts-box-border-right {
+            border-left: none;
+            border-right: 3px solid #d97706;
+            text-align: right !important;
+        }
+    }
+
+    @media (max-width: 767px) {
+        .hiw-ts-box-border-right {
+            border-left: 3px solid #d97706;
+        }
+    }
+
+    .hiw-title-badge {
+        background: #D4AF37;
+        padding: 0.5rem 1rem;
+        border-radius: 0rem;
+        color: black;
+    }
+
+    /* Mobile: disable fixed background attachment (causes jank on iOS Safari) */
+    @media (max-width: 768px) {
+        .hiw-hero {
+            background-attachment: scroll !important;
+            padding: 6rem 1.25rem 4rem !important;
+        }
+    }
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="hiw-page">
+    <div class="hiw-bg">
+        <div class="hiw-bg-pattern"></div>
+        <div class="hiw-bg-glow-tr"></div>
+        <div class="hiw-bg-glow-bl"></div>
+    </div>
+
+    <!-- HEADER -->
+    <section class="hiw-hero">
+        <div class="hiw-hero-bg-glow"></div>
+        <div class="hiw-hero-bg-glow-2"></div>
+        <div class="hiw-hero-dots"></div>
+        <div class="hiw-hero-wrap">
+            <span class="hiw-hero-sup">The Framework</span>
+            <h1 class="hiw-hero-h1">Understanding <span>Spheres</span></h1>
+            <p class="hiw-hero-p">
+                DSTAIR separates the essential elements of government and society into nine "spheres". The premise is
+                that each sphere can be described in terms of a finite set of especially important institutional
+                arrangements, and that when the "quality" of several of these arrangements suffers, the legitimacy of
+                the sphere as a whole is adversely affected.
+            </p>
+        </div>
+    </section>
+
+    <!-- 9 SPHERES GRID -->
+    <section class="hiw-spheres">
+        <div class="hiw-spheres-head">
+            <span class="hiw-spheres-sup">The Nine Pillars</span>
+            <h2 class="hiw-spheres-h2">Governance Spheres</h2>
+        </div>
+        <div class="hiw-sph-grid">
+
+            <div class="hiw-sph-card">
+                <div class="hiw-sph-img-wrap">
+                    <img src="{{ url_for('static', filename='assets/how-it-work/sphersImage/constution.jpg') }}"
+                        alt="Constitution" class="hiw-sph-img">
+                    <div class="hiw-sph-img-grad"></div>
+                    <div class="hiw-sph-ico">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                            <polyline points="14 2 14 8 20 8" />
+                            <line x1="16" y1="13" x2="8" y2="13" />
+                            <line x1="16" y1="17" x2="8" y2="17" />
+                            <polyline points="10 9 9 9 8 9" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="hiw-sph-body">
+                    <h3 class="hiw-sph-h3">Constitution</h3>
+                    <p class="hiw-sph-p">The basic laws and principles of the state, which determine the powers and
+                        duties of the government and its various branches and guarantee rights to people in it. In
+                        addition to the rules within the Constitution itself, this sphere addresses the institutions
+                        that create, maintain and modify it.</p>
+                </div>
+            </div>
+
+            <div class="hiw-sph-card">
+                <div class="hiw-sph-img-wrap">
+                    <img src="{{ url_for('static', filename='assets/how-it-work/sphersImage/legislature.jpg') }}"
+                        alt="Legislature" class="hiw-sph-img">
+                    <div class="hiw-sph-img-grad"></div>
+                    <div class="hiw-sph-ico">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 21h18" />
+                            <path d="M5 21V7l8-4 8 4v14" />
+                            <path d="M5 7h14" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="hiw-sph-body">
+                    <h3 class="hiw-sph-h3">Legislature</h3>
+                    <p class="hiw-sph-p">A branch of government whose persons have the authority to create laws for the
+                        state. Ideally, the Legislature is elected by some consensual method, appropriately reflects the
+                        citizenry that it represents and produces quality legislation that is subject to some level of
+                        review by the Courts and the Executive.</p>
+                </div>
+            </div>
+
+            <div class="hiw-sph-card">
+                <div class="hiw-sph-img-wrap">
+                    <img src="{{ url_for('static', filename='assets/how-it-work/sphersImage/executive.jpg') }}"
+                        alt="Executive" class="hiw-sph-img">
+                    <div class="hiw-sph-img-grad"></div>
+                    <div class="hiw-sph-ico">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="hiw-sph-body">
+                    <h3 class="hiw-sph-h3">Executive</h3>
+                    <p class="hiw-sph-p">A branch of government, led by the head of state, which is charged with
+                        carrying out and enforcing the laws of the state, as well as various other powers which may
+                        include diplomatic representation, commanding the armed forces, signing treaties and appointing
+                        and managing members of the public administration.</p>
+                </div>
+            </div>
+
+            <div class="hiw-sph-card">
+                <div class="hiw-sph-img-wrap">
+                    <img src="{{ url_for('static', filename='assets/how-it-work/sphersImage/publicAdministration.jpg') }}"
+                        alt="Public Administration" class="hiw-sph-img">
+                    <div class="hiw-sph-img-grad"></div>
+                    <div class="hiw-sph-ico">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                            <circle cx="9" cy="7" r="4" />
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="hiw-sph-body">
+                    <h3 class="hiw-sph-h3">Public Administration</h3>
+                    <p class="hiw-sph-p">Entails all non-political public employees charged with delivering public
+                        services. This includes police, fire, rescue, unemployment insurance administration, retirement
+                        insurance administration, national hospital systems, permit issuers, tax collectors, and so on.
+                    </p>
+                </div>
+            </div>
+
+            <div class="hiw-sph-card">
+                <div class="hiw-sph-img-wrap">
+                    <img src="{{ url_for('static', filename='assets/how-it-work/sphersImage/court.jpg') }}" alt="Courts"
+                        class="hiw-sph-img">
+                    <div class="hiw-sph-img-grad"></div>
+                    <div class="hiw-sph-ico">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M6 3h12l-2 9H8z" />
+                            <path d="M6 12v3a6 6 0 0 0 12 0v-3" />
+                            <line x1="12" y1="3" x2="12" y2="21" />
+                            <path d="M2 21h20" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="hiw-sph-body">
+                    <h3 class="hiw-sph-h3">Courts</h3>
+                    <p class="hiw-sph-p">The rules and practices responsible for delivering justice according to the
+                        Constitution and legislation. Addresses the legitimacy and impartiality of judges, juries,
+                        public defenders, district attorney and overall fairness and efficiency of the application of
+                        justice.</p>
+                </div>
+            </div>
+
+            <div class="hiw-sph-card">
+                <div class="hiw-sph-img-wrap">
+                    <img src="{{ url_for('static', filename='assets/how-it-work/sphersImage/politicalParties.jpg') }}"
+                        alt="Political Parties" class="hiw-sph-img">
+                    <div class="hiw-sph-img-grad"></div>
+                    <div class="hiw-sph-ico">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2a10 10 0 1 0 10 10 4 4 0 0 1-5-5 4 4 0 0 1-5-5" />
+                            <path d="M8.5 8.5v.01" />
+                            <path d="M16 15.5v.01" />
+                            <path d="M12 12v.01" />
+                            <path d="M11 17v.01" />
+                            <path d="M7 14v.01" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="hiw-sph-body">
+                    <h3 class="hiw-sph-h3">Political Parties</h3>
+                    <p class="hiw-sph-p">A group of persons organised to promote and support certain principles and
+                        candidates for public office. Addresses financing of campaigns, influence of parties over the
+                        political system, and commitment to fair competition.</p>
+                </div>
+            </div>
+
+            <div class="hiw-sph-card">
+                <div class="hiw-sph-img-wrap">
+                    <img src="{{ url_for('static', filename='assets/how-it-work/sphersImage/civilSocity.jpg') }}"
+                        alt="Civil Society" class="hiw-sph-img">
+                    <div class="hiw-sph-img-grad"></div>
+                    <div class="hiw-sph-ico">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                            <circle cx="9" cy="7" r="4" />
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="hiw-sph-body">
+                    <h3 class="hiw-sph-h3">Civil Society</h3>
+                    <p class="hiw-sph-p">Non-governmental organisations and associations manifesting citizens'
+                        interests. Measures the effectiveness of the citizenry in mobilizing and communicating its
+                        demands to the government between elections.</p>
+                </div>
+            </div>
+
+            <div class="hiw-sph-card">
+                <div class="hiw-sph-img-wrap">
+                    <img src="{{ url_for('static', filename='assets/how-it-work/sphersImage/economy.jpg') }}"
+                        alt="Economy" class="hiw-sph-img">
+                    <div class="hiw-sph-img-grad"></div>
+                    <div class="hiw-sph-ico">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="12" y1="1" x2="12" y2="23" />
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="hiw-sph-body">
+                    <h3 class="hiw-sph-h3">Economy</h3>
+                    <p class="hiw-sph-p">The rules and practices relating to the system of production and distribution
+                        of goods and services in the country.</p>
+                </div>
+            </div>
+
+            <div class="hiw-sph-card">
+                <div class="hiw-sph-img-wrap">
+                    <img src="{{ url_for('static', filename='assets/how-it-work/sphersImage/media.jpg') }}" alt="Media"
+                        class="hiw-sph-img">
+                    <div class="hiw-sph-img-grad"></div>
+                    <div class="hiw-sph-ico">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 11a9 9 0 0 1 9 9" />
+                            <path d="M4 4a16 16 0 0 1 16 16" />
+                            <circle cx="5" cy="19" r="1" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="hiw-sph-body">
+                    <h3 class="hiw-sph-h3">Media</h3>
+                    <p class="hiw-sph-p">Outlets (newspapers, TV, etc.) on which the citizenry depends for accurate
+                        information. Addresses reliability, comprehensiveness, and independence.</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ANALYSIS PROCESS -->
+    <section class="hiw-time">
+        <div class="hiw-time-bg"></div>
+        <div class="hiw-time-glow-tr"></div>
+        <div class="hiw-time-glow-bl"></div>
+
+        <div class="hiw-time-head">
+            <span class="hiw-time-h2-sup">Step by Step</span>
+            <h2 class="hiw-time-h2"> <span class="hiw-title-badge">Analysis Process</span></h2>
+            <div class="hiw-time-line-small"></div>
+        </div>
+
+        <div class="hiw-time-wrap">
+            <div class="hiw-time-vline"></div>
+
+            <div class="hiw-time-steps">
+
+                <!-- Step 1 -->
+                <div class="hiw-ts-row">
+                    <div class="hiw-ts-img-col left">
+                        <img src="{{ url_for('static', filename='assets/how-it-work/analysisProcess/analysisProcessS1.jpg') }}"
+                            alt="Step 1" class="hiw-ts-img">
+                    </div>
+                    <div class="hiw-ts-badge">1</div>
+                    <div class="hiw-ts-txt-col left">
+                        <span class="hiw-ts-sup">Initialization</span>
+                        <h3 class="hiw-ts-h3">Select a Country</h3>
+                        <p class="hiw-ts-p">
+                            From the Step 1: "Analysis Setup" page, you can assign a title and a country to your first
+                            analysis. The flexibility of DSTAIR allows you to analyse one or many countries across one
+                            or many spheres.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="hiw-ts-row rev">
+                    <div class="hiw-ts-img-col right">
+                        <img src="{{ url_for('static', filename='assets/how-it-work/analysisProcess/analysisProcessS2.jpg') }}"
+                            alt="Step 2" class="hiw-ts-img">
+                    </div>
+                    <div class="hiw-ts-badge">2</div>
+                    <div class="hiw-ts-txt-col right">
+                        <span class="hiw-ts-sup">Evaluation</span>
+                        <h3 class="hiw-ts-h3">Questionnaire</h3>
+                        <p class="hiw-ts-p">
+                            After selecting a country, you will be confronted with a set of questions addressing the
+                            legitimacy of each of the nine spheres. Initially, all questions are rated "N/A". As you
+                            assign ratings, they are incorporated into the score.
+                        </p>
+                        <div class="hiw-ts-box text-left">
+                            <span class="hiw-ts-box-sup">Question Types</span>
+                            <ul>
+                                <li>Metarules (quality of creating institutions)</li>
+                                <li>Rules of Operation (strengths of organizing institutions)</li>
+                                <li>Exogenous Factors (outside forces e.g., crime, war)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="hiw-ts-row">
+                    <div class="hiw-ts-img-col left">
+                        <img src="{{ url_for('static', filename='assets/how-it-work/analysisProcess/analysisProcessS3.png') }}"
+                            alt="Step 3" class="hiw-ts-img">
+                    </div>
+                    <div class="hiw-ts-badge">3</div>
+                    <div class="hiw-ts-txt-col left">
+                        <span class="hiw-ts-sup">Synthesis</span>
+                        <h3 class="hiw-ts-h3">Legitimacy Score</h3>
+                        <p class="hiw-ts-p">
+                            Rated questions are incorporated into the DSTAIR model and output as "legitimacy" scores for
+                            each sphere. These values are shown above the tabs for each sphere. Calculations are
+                            refreshed whenever you switch screens or click "save".
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="hiw-ts-row rev">
+                    <div class="hiw-ts-img-col right">
+                        <img src="{{ url_for('static', filename='assets/methodology_illustration_4.png') }}"
+                            alt="Step 4" class="hiw-ts-img"
+                            onerror="this.src='{{ url_for('static', filename='assets/how-it-work/analysisProcess/analysisProcessS1.jpg') }}'">
+                    </div>
+                    <div class="hiw-ts-badge">4</div>
+                    <div class="hiw-ts-txt-col right">
+                        <span class="hiw-ts-sup">Action</span>
+                        <h3 class="hiw-ts-h3">Anti-Corruption Tools</h3>
+                        <p class="hiw-ts-p">
+                            A set of 28 anti-corruption tools are compared against the scores. Each tool requires that
+                            legitimacy scores in the nine spheres be greater than pre-specified threshold levels to be
+                            "triggered".
+                        </p>
+                        <div class="hiw-ts-box hiw-ts-box-border-right">
+                            <p>
+                                "If all the answers in a sphere are N/A, DSTAIR will remove that sphere from
+                                consideration as a trigger for tools."
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+</div>
+{% endblock %}

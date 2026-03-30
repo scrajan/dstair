@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+
+{% block title %}500 Internal Error - DSTAIR{% endblock %}
+
+{% block extra_css %}
+<!-- ── ERROR PAGE STYLES ───────────────────────────────────────────────── -->
+<!-- Custom styling for the error pages ensures a consistent and immersive 
+     experience even when things go wrong. -->
+<style>
+    .error-page {
+        min-height: 100vh;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        z-index: 10;
+        padding: 8rem 1.5rem 5rem;
+    }
+
+    .error-page__bg {
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        z-index: 0;
+        overflow: hidden;
+        background: linear-gradient(to bottom right, #FFF0E0, #F7F7F5, #F0F5FF);
+    }
+
+    .error-page__orb {
+        position: absolute;
+        border-radius: 50%;
+        width: 50vw;
+        height: 50vw;
+        filter: blur(150px);
+        opacity: 0.6;
+    }
+
+    .error-page__orb--404 {
+        top: 20%;
+        left: -10%;
+        background: rgba(217, 119, 6, 0.1);
+    }
+
+    .error-page__orb--500 {
+        top: 20%;
+        right: -10%;
+        background: rgba(244, 63, 94, 0.1);
+        animation: error-pulse 4s ease-in-out infinite;
+    }
+
+    @keyframes error-pulse {
+
+        0%,
+        100% {
+            opacity: 0.6;
+        }
+
+        50% {
+            opacity: 0.3;
+        }
+    }
+
+    .error-card {
+        max-width: 40rem;
+        margin: 0 auto;
+        padding: 3rem;
+        border-radius: 3rem;
+        border: 1px solid rgba(10, 25, 47, 0.1);
+        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.85);
+        box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+        position: relative;
+        z-index: 10;
+    }
+
+    .error-icon {
+        width: 6rem;
+        height: 6rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 2rem;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+    }
+
+    .error-icon--404 {
+        background: #F7F7F5;
+        border: 1px solid rgba(10, 25, 47, 0.1);
+        color: #D97706;
+    }
+
+    .error-icon--500 {
+        background: #fef2f2;
+        border: 1px solid rgba(244, 63, 94, 0.1);
+        color: #f43f5e;
+    }
+
+    .error-code {
+        font-family: Outfit, sans-serif;
+        font-size: 4rem;
+        font-weight: 900;
+        letter-spacing: -0.025em;
+        color: #0A192F;
+        margin-bottom: 1rem;
+    }
+
+    .error-title {
+        font-family: 'Playfair Display', serif;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #0A192F;
+        margin-bottom: 1.5rem;
+    }
+
+    .error-message {
+        color: rgba(10, 25, 47, 0.6);
+        font-size: 1.125rem;
+        line-height: 1.75;
+        font-weight: 300;
+        margin-bottom: 2.5rem;
+    }
+
+    .error-cta {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.75rem;
+        background: #0A192F;
+        color: white;
+        font-weight: 600;
+        font-size: 0.875rem;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 40px -10px rgba(10, 25, 47, 0.1);
+    }
+
+    .error-cta:hover {
+        background: #1a2a42;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    /* --------------------------------------------------------------------------
+       ID-Targeted Premium Overrides (500 Error Page)
+       -------------------------------------------------------------------------- */
+    #dstair-error-page-500 {
+        background: linear-gradient(135deg, #fff1f2, #ffe4e6) !important;
+    }
+
+    #dstair-error-page-500 .error-card {
+        background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.95), rgba(255, 241, 242, 0.85)) !important;
+        border: 4px solid #fca5a5 !important;
+        border-radius: 3rem !important;
+        box-shadow: 0 30px 60px rgba(244, 63, 94, 0.15), inset 0 0 20px rgba(255, 255, 255, 0.8) !important;
+    }
+
+    #dstair-error-page-500 .error-icon {
+        background: #fff1f2 !important;
+        border: 2px solid #fecdd3 !important;
+        color: #e11d48 !important;
+    }
+
+    #dstair-error-page-500 .error-cta {
+        background: linear-gradient(135deg, #e11d48, #be123c) !important;
+        box-shadow: 0 10px 20px rgba(225, 29, 72, 0.2) !important;
+        border: none !important;
+    }
+
+    #dstair-error-page-500 .error-cta:hover {
+        background: linear-gradient(135deg, #be123c, #9f1239) !important;
+        box-shadow: 0 15px 30px rgba(225, 29, 72, 0.3) !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- 
+  =============================================================================
+  500 ERROR LAYOUT
+  =============================================================================
+  Displays a stylized "Internal System Error" message that fits within the DSTAIR 
+  design language, featuring soft gradients, subtle pulsing animations, and 
+  a fallback generic error message if a specific one isn't passed.
+  =============================================================================
+-->
+<section id="dstair-error-page-500" class="error-page">
+
+    <!-- ── IMMERSIVE BACKGROUND ────────────────────────────────────────────── -->
+    <!-- Background with pulsing orb specific to the 500 status (red-tinted) -->
+    <div class="error-page__bg">
+        <div class="error-page__orb error-page__orb--500"></div>
+    </div>
+
+    <!-- ── ERROR CONTENT CARD ──────────────────────────────────────────────── -->
+    <!-- Glassmorphic card containing the error details and CTA -->
+    <div class="error-card">
+
+        <!-- Error Icon Element -->
+        <div class="error-icon error-icon--500">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="1.5">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+                <line x1="12" y1="9" x2="12" y2="13" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+        </div>
+
+        <h1 class="error-code">500</h1>
+        <h2 class="error-title">Internal System Error</h2>
+
+        <p class="error-message">
+            {{ error | default("Our analytical engine encountered an unexpected runtime anomaly. Our diagnostic teams
+            have been alerted.") }}
+        </p>
+
+        <a href="{{ url_for('public.home') }}" class="error-cta">
+            Restart Initialization
+        </a>
+
+    </div>
+</section>
+{% endblock %}

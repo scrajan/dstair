@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - DSTAIR{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+<!-- 
+  =============================================================================
+  ADMIN DASHBOARD STYLES (.a-dash-*)
+  Strictly scoped to admin/dashboard.html ONLY. Zero inheritance.
+  =============================================================================
+-->
+
+{% endblock %}
+
+{% block content %}
+<section class="a-dash-wrapper">
+    <div class="a-dash-layout">
+
+        <!-- ── ADMIN HEADER ──────────────────────────────────────────────── -->
+        <div class="a-dash-head">
+            <span class="a-dash-lbl">Administrator Panel</span>
+            <h1 class="a-dash-h1">Admin <span class="a-dash-h1-hl">Dashboard</span></h1>
+        </div>
+
+        <!-- ── STATISTICS CARDS ──────────────────────────────────────────── -->
+        <div class="a-dash-stats">
+            <div class="a-dash-scard a-dash-scard--1">
+                <div class="a-dash-sicon-wrap">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2.5">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
+                </div>
+                <p class="a-dash-sname">Total Users</p>
+                <p class="a-dash-sval">{{ total_users }}</p>
+            </div>
+
+            <div class="a-dash-scard a-dash-scard--2">
+                <div class="a-dash-sicon-wrap">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2.5">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                        <circle cx="8.5" cy="7" r="4" />
+                        <polyline points="17 11 19 13 23 9" />
+                    </svg>
+                </div>
+                <p class="a-dash-sname">Administrators</p>
+                <p class="a-dash-sval">{{ admin_count }}</p>
+            </div>
+
+            <div class="a-dash-scard a-dash-scard--3">
+                <div class="a-dash-sicon-wrap">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2.5">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                    </svg>
+                </div>
+                <p class="a-dash-sname">Regular Users</p>
+                <p class="a-dash-sval">{{ user_count }}</p>
+            </div>
+
+            <a href="{{ url_for('admin.access_requests') }}" class="a-dash-scard a-dash-scard--4">
+                <div class="a-dash-sicon-wrap">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2.5">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                        <polyline points="22,6 12,13 2,6" />
+                    </svg>
+                </div>
+                <p class="a-dash-sname">Pending Requests</p>
+                <p class="a-dash-sval">{{ pending_requests }}</p>
+            </a>
+        </div>
+
+        <!-- ── MAIN CONTENT GRID ─────────────────────────────────────────── -->
+        <div class="a-dash-main">
+
+            <!-- Left Panel: Recent Users -->
+            <div class="a-dash-panel">
+                <div class="a-dash-phead">
+                    <h2 class="a-dash-ptilt">
+                        <div class="a-dash-ptilt-ico">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2.5">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                                <circle cx="9" cy="7" r="4" />
+                                <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                            </svg>
+                        </div>
+                        Recent Users
+                    </h2>
+                    <a href="{{ url_for('admin.users') }}" class="a-dash-pview">View All &rarr;</a>
+                </div>
+
+                <div class="a-dash-ulist">
+                    {% for user in recent_users %}
+                    <div class="a-dash-urow">
+                        <div class="a-dash-ul">
+                            <div class="a-dash-uav">
+                                {{ user.user_account_unique_username_string[0].upper() }}
+                            </div>
+                            <div class="a-dash-uinfo">
+                                <p class="a-dash-uname">{{ user.user_account_unique_username_string }}</p>
+                                {% if user.user_account_authentication_email_address_string %}
+                                <p class="a-dash-umail">{{ user.user_account_authentication_email_address_string }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="a-dash-ur">
+                            <span
+                                class="a-dash-urole {% if user.user_account_authorization_role_identifier_string == 'admin' %}a-dash-urole--admin{% else %}a-dash-urole--user{% endif %}">
+                                {{ user.user_account_authorization_role_identifier_string }}
+                            </span>
+                            <span class="a-dash-uid">#{{ user.unique_database_identifier_integer }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Right Panel: Quick Actions -->
+            <!-- not required -->
+
+        </div>
+
+    </div>
+</section>
+{% endblock %}

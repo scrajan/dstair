@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>{{ analysis.title }} - DSTAIR</title>
+    {% include 'includes/global_styles.html' %}
+    <!-- Alpine.js (required for nav.html) -->
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
+    <style>
+        [x-cloak] { display: none !important; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --brand-dark:   #064E3B;
+            --brand-darker: #022C22;
+            --brand-accent: #F97316;
+            --brand-accent-h: #EA580C;
+            --bg-canvas:    #F3F4F6;
+            --surface:      #FFFFFF;
+            --border:       #E5E7EB;
+            --border-strong:#D1D5DB;
+            --text-main:    #111827;
+            --text-muted:   #4B5563;
+            --text-soft:    #6B7280;
+            --font-sans:    'Inter', system-ui, sans-serif;
+            --font-display: 'Outfit', system-ui, sans-serif;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg-canvas);
+            background-image: linear-gradient(to bottom, rgba(6,78,59,0.04) 0%, transparent 500px);
+            color: var(--text-main);
+            padding-top: 96px;
+        }
+
+        /* ── Toolbar ───────────────────────────────────────────────────────── */
+        .analysis-toolbar {
+            position: sticky;
+            top: 96px;
+            z-index: 40;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+            padding: 0.875rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
+        }
+        .analysis-title-row {
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+        }
+        .analysis-title {
+            font-family: var(--font-display);
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #000000;
+            letter-spacing: -0.01em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 360px;
+        }
+
+        /* Flag with tooltip */
+        .analysis-flag-wrap {
+            position: relative;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+        }
+        .analysis-flag-wrap img {
+            width: 40px;
+            height: 28px;
+            object-fit: cover;
+            border-radius: 3px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+            display: block;
+            cursor: default;
+        }
+        .analysis-flag-wrap .flag-tooltip {
+            position: absolute;
+            bottom: calc(100% + 6px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1f2937;
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.25rem 0.6rem;
+            border-radius: 0.375rem;
+            white-space: nowrap;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.15s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .analysis-flag-wrap .flag-tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%; left: 50%;
+            transform: translateX(-50%);
+            border: 4px solid transparent;
+            border-top-color: #1f2937;
+        }
+        .analysis-flag-wrap:hover .flag-tooltip { opacity: 1; }
+
+        .nav-tabs {
+            display: flex;
+            gap: 0.25rem;
+            background: #F9FAFB;
+            padding: 0.25rem;
+            border-radius: 0.625rem;
+            border: 1px solid var(--border);
+        }
+        .nav-tab {
+            padding: 0.45rem 1.25rem;
+            border-radius: 0.4rem;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: var(--text-soft);
+            transition: all 0.18s;
+            white-space: nowrap;
+            color: var(--brand-dark); background: rgba(6,78,59,0.05);
+        }
+        
+        .nav-tab.active {
+            background: var(--brand-dark);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(6,78,59,0.25);
+        }
+
+        .back-link {
+            color: var(--text-soft);
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: color 0.18s;
+            white-space: nowrap;
+        }
+        .back-link:hover { color: var(--brand-dark); }
+
+        /* ── Workspace ─────────────────────────────────────────────────────── */
+        .workspace { display: flex; min-height: calc(100vh - 96px - 57px); }
+        #tab-content { flex: 1; }
+
+        /* ── Loading ───────────────────────────────────────────────────────── */
+        .tab-loading { display: flex; align-items: center; justify-content: center; padding: 5rem; }
+        .tab-loading-spinner {
+            width: 2rem; height: 2rem;
+            border: 2.5px solid var(--border);
+            border-top-color: var(--brand-dark);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ── Toast ─────────────────────────────────────────────────────────── */
+        .toast {
+            position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9999;
+            padding: 0.75rem 1.25rem; border-radius: 0.75rem;
+            font-size: 0.82rem; font-weight: 600;
+            border: 1px solid transparent;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+            transition: opacity 0.3s; opacity: 0; pointer-events: none;
+        }
+        .toast.show { opacity: 1; pointer-events: auto; }
+        .toast.success { background: #ECFDF5; color: #065F46; border-color: #A7F3D0; }
+        .toast.error   { background: #FEF2F2; color: #991B1B; border-color: #FECACA; }
+
+        /* ── Analysis Page Modals (analysis-modal- prefix to prevent leakage) ── */
+        .analysis-modal-overlay {
+            display: none;
+            position: fixed; inset: 0; z-index: 200;
+            align-items: center; justify-content: center;
+            padding: 1rem;
+        }
+        .analysis-modal-overlay.active { display: flex !important; }
+
+        .analysis-modal-backdrop-blur {
+            position: absolute; inset: 0;
+            background: rgba(2,12,8,0.35);
+            backdrop-filter: blur(4px);
+        }
+        .analysis-modal-content-panel {
+            position: relative; z-index: 1;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            width: calc(100% - 2rem);
+            max-height: calc(100vh - 4rem);
+            overflow-y: auto;
+            box-shadow: 0 24px 64px rgba(0,0,0,0.18);
+        }
+        .analysis-modal-content-panel--sm  { max-width: 28rem; }
+        .analysis-modal-content-panel--md  { max-width: 36rem; }
+        .analysis-modal-content-panel--lg  { max-width: 44rem; }
+
+        .analysis-modal-panel-header {
+            padding: 1.25rem 1.5rem 1rem;
+            border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; background: var(--surface); z-index: 2;
+            border-radius: 1rem 1rem 0 0;
+        }
+        .analysis-modal-eyebrow-label {
+            font-size: 0.6rem; font-weight: 800; text-transform: uppercase;
+            letter-spacing: 0.12em; color: #9CA3AF; margin-bottom: 0.25rem;
+        }
+        .analysis-modal-heading-text {
+            font-family: var(--font-display); font-size: 1rem; font-weight: 800;
+            color: var(--brand-darker); letter-spacing: -0.01em; line-height: 1.3;
+            padding-right: 2rem;
+        }
+        .analysis-modal-close-x-button {
+            position: absolute; top: 1rem; right: 1rem;
+            background: none; border: none; cursor: pointer;
+            color: var(--text-soft); font-size: 1.25rem; line-height: 1;
+            transition: color 0.15s; padding: 0.25rem;
+            border-radius: 0.25rem;
+        }
+        .analysis-modal-close-x-button:hover { color: var(--text-main); background: #F3F4F6; }
+
+        .analysis-modal-body-content { padding: 1.25rem 1.5rem; }
+
+        /* Info modal body */
+        .analysis-modal-help-info-text {
+            font-size: 0.875rem; color: var(--text-muted); line-height: 1.7;
+            white-space: pre-wrap;
+        }
+        .analysis-modal-no-info-placeholder {
+            font-size: 0.875rem; color: #9CA3AF; font-style: italic;
+        }
+
+        /* AI modal */
+        .analysis-modal-ai-country-badge {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            background: rgba(6,78,59,0.08); border: 1px solid rgba(6,78,59,0.18);
+            color: var(--brand-dark); border-radius: 9999px;
+            padding: 0.3rem 0.875rem; font-size: 0.75rem; font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        .analysis-modal-ai-rating-panel {
+            display: flex; gap: 0.25rem; align-items: center; margin: 1rem 0 0.35rem;
+        }
+        .analysis-modal-ai-rating-cell {
+            flex: 1; text-align: center; padding: 0.55rem 0.2rem;
+            border: 1px solid #E5E7EB; border-radius: 0.4rem;
+            font-size: 0.82rem; font-weight: 700; color: #9CA3AF;
+            background: #F9FAFB; user-select: none;
+        }
+        .analysis-modal-ai-rating-cell--active {
+            background: #7C3AED; color: #fff; border-color: #7C3AED;
+            box-shadow: 0 2px 8px rgba(124,58,237,0.3);
+        }
+        .analysis-modal-ai-rated-tag {
+            display: inline-flex; align-items: center; gap: 0.3rem;
+            font-size: 0.62rem; font-weight: 800; text-transform: uppercase;
+            letter-spacing: 0.08em; color: #6D28D9;
+            background: #F5F3FF; border: 1px solid #DDD6FE;
+            border-radius: 0.25rem; padding: 0.15rem 0.5rem; margin-left: 0.5rem;
+        }
+        .analysis-modal-ai-rating-endpoints {
+            display: flex; justify-content: space-between;
+            font-size: 0.65rem; font-weight: 600; color: #9CA3AF;
+            padding: 0 0.1rem; margin-bottom: 1rem;
+        }
+        .analysis-modal-ai-reasoning-label {
+            font-size: 0.62rem; font-weight: 800; text-transform: uppercase;
+            letter-spacing: 0.1em; color: #9CA3AF; margin-bottom: 0.5rem;
+        }
+        .analysis-modal-ai-reasoning-text {
+            font-size: 0.875rem; color: var(--text-muted); line-height: 1.7;
+        }
+        .analysis-modal-ai-meta-row {
+            display: flex; align-items: center; gap: 1rem; margin-top: 1rem;
+            padding-top: 1rem; border-top: 1px solid var(--border);
+            font-size: 0.72rem; color: #9CA3AF;
+        }
+        .analysis-modal-ai-score-display {
+            font-family: var(--font-display); font-size: 1.5rem; font-weight: 800;
+            color: #7C3AED; letter-spacing: -0.02em;
+        }
+        .analysis-modal-unavailable-message {
+            font-size: 0.875rem; color: #6B7280;
+            text-align: center; padding: 1rem 0;
+        }
+
+        /* Comments modal */
+        .analysis-modal-comments-thread {
+            display: flex; flex-direction: column; gap: 0.875rem;
+            margin-bottom: 1.25rem; max-height: 320px; overflow-y: auto;
+        }
+        .analysis-modal-comment-item {
+            display: flex; gap: 0.75rem; align-items: flex-start;
+        }
+        .analysis-modal-comment-avatar-circle {
+            width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+            background: var(--brand-dark); color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+        }
+        .analysis-modal-comment-bubble {
+            flex: 1; background: #F9FAFB; border: 1px solid #E5E7EB;
+            border-radius: 0 0.625rem 0.625rem 0.625rem; padding: 0.75rem 1rem;
+        }
+        .analysis-modal-comment-author-name {
+            font-size: 0.78rem; font-weight: 700; color: #1F2937;
+        }
+        .analysis-modal-comment-date-text {
+            font-size: 0.65rem; color: #9CA3AF; margin-left: 0.5rem;
+        }
+        .analysis-modal-comment-body-text {
+            font-size: 0.84rem; color: #374151; margin-top: 0.3rem; line-height: 1.6;
+        }
+        .analysis-modal-no-comments-placeholder {
+            text-align: center; padding: 1.5rem 0; font-size: 0.875rem; color: #9CA3AF;
+        }
+        .analysis-modal-new-comment-divider {
+            border: none; border-top: 1px solid #E5E7EB; margin: 0 0 1rem;
+        }
+        .analysis-modal-new-comment-label {
+            font-size: 0.72rem; font-weight: 700; color: #6B7280;
+            text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem;
+        }
+        .analysis-modal-comment-textarea {
+            width: 100%; padding: 0.75rem; background: #F9FAFB;
+            border: 1px solid var(--border); border-radius: 0.5rem;
+            color: var(--text-main); font-size: 0.875rem; resize: vertical;
+            font-family: inherit; min-height: 80px;
+        }
+        .analysis-modal-comment-textarea:focus {
+            outline: none; border-color: var(--brand-dark);
+            box-shadow: 0 0 0 3px rgba(6,78,59,0.1);
+        }
+        .analysis-modal-comment-textarea::placeholder { color: #9CA3AF; }
+        .analysis-modal-comment-submit-row {
+            display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 0.75rem;
+        }
+        .analysis-modal-btn-cancel {
+            padding: 0.5rem 1rem; border: 1px solid var(--border);
+            border-radius: 0.5rem; background: var(--surface); color: var(--text-soft);
+            cursor: pointer; font-size: 0.84rem; transition: all 0.15s;
+        }
+        .analysis-modal-btn-cancel:hover { color: var(--text-main); border-color: var(--border-strong); }
+        .analysis-modal-btn-post-comment {
+            padding: 0.5rem 1.25rem; background: var(--brand-dark); color: white;
+            border: none; border-radius: 0.5rem; cursor: pointer;
+            font-size: 0.84rem; font-weight: 700; transition: all 0.15s;
+        }
+        .analysis-modal-btn-post-comment:hover { background: var(--brand-darker); }
+
+        /* ==========================================================================
+        MOBILE RESPONSIVE — Analysis Page
+        Only additive @media blocks. No existing rules touched.
+        ========================================================================== */
+        @media (max-width: 768px) {
+            body {
+                padding-top: 72px;
+            }
+
+            /* Toolbar: stack title and tabs vertically */
+            .analysis-toolbar {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+                padding: 0.75rem 1rem;
+                top: 72px;
+            }
+
+            /* Title: allow wrapping, remove max-width constraint */
+            .analysis-title {
+                font-size: 1.2rem;
+                max-width: 100%;
+                white-space: normal;
+                overflow: visible;
+                text-overflow: unset;
+            }
+
+            /* Nav tabs: allow scroll on mobile */
+            .nav-tabs {
+                width: 100%;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                flex-wrap: nowrap;
+                scrollbar-width: none;
+            }
+            .nav-tabs::-webkit-scrollbar { display: none; }
+
+            .nav-tab {
+                padding: 0.4rem 0.875rem;
+                flex-shrink: 0;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .analysis-toolbar {
+                padding: 0.625rem 0.875rem;
+            }
+
+            .analysis-title {
+                font-size: 1rem;
+            }
+
+            .back-link span {
+                display: none; /* hide back text, keep arrow */
+            }
+        }
+    </style>
+</head>
+<body>
+    {% include 'includes/nav.html' %}
+
+    <div class="analysis-toolbar">
+        <div class="analysis-title-row">
+            {% set an_country_obj = analysis.country_obj %}
+            {% if an_country_obj and an_country_obj.iso2_code %}
+            <div class="analysis-flag-wrap">
+                <img src="https://flagcdn.com/w40/{{ an_country_obj.iso2_code.lower() }}.png"
+                     alt="{{ analysis.country }}">
+                <span class="flag-tooltip">{{ analysis.country }}</span>
+            </div>
+            {% endif %}
+            <div class="analysis-title">{{ analysis.title }}</div>
+        </div>
+
+        <nav class="nav-tabs" role="tablist">
+            <button class="nav-tab active" data-tab="questionnaire" onclick="switchTab('questionnaire', this)" role="tab">Questions</button>
+            <button class="nav-tab" data-tab="results" onclick="switchTab('results', this)" role="tab">Results</button>
+            <button class="nav-tab" data-tab="tools" onclick="switchTab('tools', this)" role="tab">Tools</button>
+            <button class="nav-tab" data-tab="ai_analysis" onclick="switchTab('ai_analysis', this)" role="tab">AI Analysis</button>
+        </nav>
+
+        
+    </div>
+
+    <div class="workspace">
+        <div id="tab-content">
+            <div class="tab-loading">
+                <div class="tab-loading-spinner"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast" role="alert"></div>
+
+    <script>
+    const ANALYSIS_ID = {{ analysis.id }};
+    const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    const TAB_URL = "{{ url_for('analysis.tab', username=current_user.user_account_unique_username_string, analysis_id=analysis.id, tab_name='__TAB__') }}";
+    const ANSWER_URL   = "{{ url_for('analysis.answer', analysis_id=analysis.id) }}";
+    const COMMENT_URL  = "{{ url_for('analysis.post_comment', question_id=0) }}";
+    const COMMENTS_GET_URL = "{{ url_for('analysis.get_comments', question_id=0) }}";
+
+    let activeTab = 'questionnaire';
+    let tabCache = {};
+
+    function showToast(msg, type = 'success') {
+        const el = document.getElementById('toast');
+        el.textContent = msg;
+        el.className = 'toast ' + type + ' show';
+        setTimeout(() => el.classList.remove('show'), 3500);
+    }
+
+    function switchTab(tabName, btn) {
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+        activeTab = tabName;
+        loadTab(tabName);
+    }
+
+    function loadTab(tabName, force = false) {
+        if (!force && tabCache[tabName]) {
+            const container = document.getElementById('tab-content');
+            container.innerHTML = '';
+            container.appendChild(document.createRange().createContextualFragment(tabCache[tabName]));
+            initTabBehavior(tabName);
+            return;
+        }
+
+        document.getElementById('tab-content').innerHTML = '<div class="tab-loading"><div class="tab-loading-spinner"></div></div>';
+
+        const url = TAB_URL.replace('__TAB__', tabName);
+        fetch(url, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': CSRF_TOKEN }
+        })
+        .then(r => {
+            if (!r.ok) throw new Error('Failed to load tab');
+            return r.text();
+        })
+        .then(html => {
+            tabCache[tabName] = html;
+            const container = document.getElementById('tab-content');
+            container.innerHTML = '';
+            // createContextualFragment executes embedded <script> tags correctly
+            // (unlike innerHTML which silently drops them)
+            const fragment = document.createRange().createContextualFragment(html);
+            container.appendChild(fragment);
+            initTabBehavior(tabName);
+        })
+        .catch(() => {
+            document.getElementById('tab-content').innerHTML =
+                '<div style="padding:2rem;color:#ef4444;">Failed to load content. Please refresh.</div>';
+        });
+    }
+
+    function initTabBehavior(tabName) {
+        if (tabName === 'questionnaire') initQuestionnaire();
+        if (tabName === 'results') initResults();
+        if (tabName === 'tools') initTools();
+        // ai_analysis tab is server-rendered static HTML, no JS init needed
+    }
+
+    // ── Questionnaire ─────────────────────────────────────────────
+    function initQuestionnaire() {
+        // Sidebar sphere navigation
+        document.querySelectorAll('.qn-sphere-nav-list-item').forEach(item => {
+            item.addEventListener('click', function () {
+                const slug = this.dataset.sphere;
+                document.querySelectorAll('.qn-sphere-questions-section').forEach(s => s.classList.remove('active'));
+                document.querySelectorAll('.qn-sphere-nav-list-item').forEach(s => s.classList.remove('active'));
+                const section = document.getElementById('sphere-' + slug);
+                if (section) section.classList.add('active');
+                this.classList.add('active');
+                qnSyncRightContextPanel(this, section);
+            });
+        });
+
+        // Auto-submit on radio change
+        document.querySelectorAll('.qn-question-rating-form').forEach(form => {
+            form.querySelectorAll('input[type="radio"]').forEach(radio => {
+                radio.addEventListener('change', function () {
+                    recalcScores();
+                    const payload = {
+                        sphere: form.dataset.sphere,
+                        question_id: form.dataset.question,
+                        value: this.value,
+                        timestamp: Date.now()
+                    };
+                    fetch(ANSWER_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': CSRF_TOKEN
+                        },
+                        body: JSON.stringify(payload)
+                    })
+                    .then(r => r.json())
+                    .then(data => {
+                        if (data.success) {
+                            updateTriggeredTools(data.triggered_tools || []);
+                            delete tabCache['results'];
+                            delete tabCache['tools'];
+                        } else {
+                            showToast(data.error || 'Failed to save answer.', 'error');
+                        }
+                    })
+                    .catch(() => showToast('Network error saving answer.', 'error'));
+                });
+            });
+        });
+
+        // Info buttons
+        document.querySelectorAll('[data-info-question]').forEach(btn => {
+            btn.addEventListener('click', function () {
+                openInfoModal(this.dataset.helpInfo, this.dataset.questionText);
+            });
+        });
+
+        // AI context buttons
+        document.querySelectorAll('[data-ai-context]').forEach(btn => {
+            btn.addEventListener('click', function () {
+                loadAiContext(this.dataset.aiContext);
+            });
+        });
+
+        // Comment buttons
+        document.querySelectorAll('[data-comment-question]').forEach(btn => {
+            btn.addEventListener('click', function () {
+                openCommentModal(this.dataset.commentQuestion);
+            });
+        });
+
+        // Initial scores + right panel
+        recalcScores();
+        const qnFirstActiveNavItem = document.querySelector('.qn-sphere-nav-list-item.active');
+        if (qnFirstActiveNavItem) {
+            const qnFirstSlug = qnFirstActiveNavItem.dataset.sphere;
+            qnSyncRightContextPanel(qnFirstActiveNavItem, document.getElementById('sphere-' + qnFirstSlug));
+        }
+    }
+
+    // ── Right Context Panel Sync ───────────────────────────────────
+    function qnSyncRightContextPanel(navItem, section) {
+        if (!section) return;
+
+        const qnImageUrl       = section.dataset.sphereImage || '';
+        const qnLabel          = section.dataset.sphereLabel || '';
+        const qnDesc           = section.dataset.sphereDesc  || '';
+        const qnGradient       = section.dataset.sphereFallbackGradient || 'linear-gradient(145deg,#064E3B,#059669)';
+        const qnInitialLetter  = section.dataset.sphereInitial || '?';
+
+        // Fallback gradient + monogram
+        const qnFallbackDiv = document.getElementById('qn-context-panel-sphere-fallback-gradient-div');
+        const qnMonogram    = document.getElementById('qn-context-panel-sphere-fallback-monogram-letter');
+        if (qnFallbackDiv) qnFallbackDiv.style.background = qnGradient;
+        if (qnMonogram)    qnMonogram.textContent = qnInitialLetter;
+
+        // Image
+        const qnImg = document.getElementById('qn-context-panel-sphere-actual-image');
+        if (qnImg) {
+            if (qnImageUrl) {
+                qnImg.style.display = 'none'; // hide until onload fires
+                if (qnFallbackDiv) qnFallbackDiv.style.display = 'flex';
+                qnImg.src = qnImageUrl;
+                qnImg.alt = qnLabel;
+            } else {
+                qnImg.style.display = 'none';
+                if (qnFallbackDiv) qnFallbackDiv.style.display = 'flex';
+            }
+        }
+
+        // Name + description
+        const qnNameEl = document.getElementById('qn-context-panel-sphere-name-text');
+        const qnDescEl = document.getElementById('qn-context-panel-sphere-desc-text');
+        if (qnNameEl) qnNameEl.textContent = qnLabel;
+        if (qnDescEl) qnDescEl.textContent = qnDesc;
+
+        // Completion progress
+        qnUpdateRightPanelProgress(section);
+    }
+
+    function qnUpdateRightPanelProgress(section) {
+        if (!section) return;
+        const qnForms = section.querySelectorAll('.qn-question-rating-form');
+        let qnAnswered = 0;
+        qnForms.forEach(form => {
+            const checked = form.querySelector('input[type="radio"]:checked');
+            if (checked && checked.value !== '-1') qnAnswered++;
+        });
+        const qnTotal = qnForms.length;
+        const qnPct   = qnTotal > 0 ? (qnAnswered / qnTotal * 100) : 0;
+
+        const qnAnsEl   = document.getElementById('qn-context-panel-answered-count-number');
+        const qnTotEl   = document.getElementById('qn-context-panel-total-count-number');
+        const qnBarEl   = document.getElementById('qn-context-panel-completion-progress-bar');
+        const qnChipEl  = section.querySelector('.qn-sphere-section-answered-count-chip');
+
+        const qnPctBadge = document.getElementById('qn-context-panel-pct-badge');
+        if (qnAnsEl) qnAnsEl.textContent = qnAnswered;
+        if (qnTotEl) qnTotEl.textContent = qnTotal;
+        if (qnPctBadge) qnPctBadge.textContent = Math.round(qnPct) + '%';
+        if (qnBarEl) {
+            qnBarEl.style.width = qnPct + '%';
+            qnBarEl.style.background = (qnAnswered === qnTotal && qnTotal > 0)
+                ? 'linear-gradient(90deg,#064E3B,#F97316)'
+                : 'linear-gradient(90deg,#064E3B,#059669)';
+        }
+        if (qnChipEl) qnChipEl.textContent = qnAnswered + ' / ' + qnTotal;
+    }
+
+    // Track triggered tool IDs in memory for the session
+    let triggeredToolIds = [];
+
+    function updateTriggeredTools(ids) {
+        triggeredToolIds = ids;
+        document.querySelectorAll('.tl-tool-recommendation-card[data-tool-id]').forEach(card => {
+            const id = parseInt(card.dataset.toolId);
+            card.classList.toggle('tl-tool-recommendation-card--triggered', ids.includes(id));
+        });
+    }
+
+    // ── Client-side scoring: I_j = Σ(a×r) / (7×Σa) ──────────────
+    function buildImportanceMap() {
+        const map = {};
+        document.querySelectorAll('.qn-question-rating-form[data-question][data-importance]').forEach(form => {
+            map[form.dataset.question] = parseInt(form.dataset.importance) || 1;
+        });
+        return map;
+    }
+
+    function recalcScores() {
+        const answers = collectCurrentAnswers();
+        const importanceMap = buildImportanceMap();
+        const sphereScores = [];
+
+        document.querySelectorAll('.qn-sphere-nav-list-item[data-sphere]').forEach(item => {
+            const rawName = item.dataset.sphereName || item.dataset.sphere;
+            const sphereAnswers = answers[rawName] || {};
+
+            let num = 0, den = 0;
+            for (const [qid, val] of Object.entries(sphereAnswers)) {
+                if (val === '-1' || val === null || val === undefined) continue;
+                const r = parseInt(val);
+                if (isNaN(r)) continue;
+                const a = importanceMap[qid] || 1;
+                num += a * r;
+                den += a * 7;
+            }
+
+            const scoreEl = item.querySelector('.qn-sphere-nav-item-score-display');
+            if (scoreEl) {
+                if (den > 0) {
+                    const score = num / den;
+                    sphereScores.push(score);
+                    scoreEl.textContent = 'Score: ' + score.toFixed(3);
+                } else {
+                    scoreEl.textContent = 'Not yet scored';
+                }
+            }
+
+            // Sidebar progress bar
+            const section = document.getElementById('sphere-' + item.dataset.sphere);
+            const progressEl = item.querySelector('.qn-sphere-nav-item-progress-fill');
+            if (progressEl && section) {
+                const totalForms = section.querySelectorAll('.qn-question-rating-form').length;
+                const answeredCount = Object.values(sphereAnswers).filter(v => v !== '-1' && v !== null && v !== undefined).length;
+                const pct = totalForms > 0 ? (answeredCount / totalForms * 100) : 0;
+                progressEl.style.width = pct + '%';
+                progressEl.style.background = (answeredCount === totalForms && totalForms > 0)
+                    ? 'linear-gradient(90deg,#064E3B,#F97316)'
+                    : 'linear-gradient(90deg,#064E3B,#059669)';
+            }
+        });
+
+        const aggEl = document.getElementById('qn-aggregate-score-display');
+        if (aggEl) {
+            aggEl.textContent = sphereScores.length > 0
+                ? (sphereScores.reduce((a, b) => a + b, 0) / sphereScores.length).toFixed(3)
+                : '—';
+        }
+
+        // Sync right panel progress for active sphere
+        const qnActiveNavItem = document.querySelector('.qn-sphere-nav-list-item.active');
+        if (qnActiveNavItem) {
+            const qnActiveSection = document.getElementById('sphere-' + qnActiveNavItem.dataset.sphere);
+            qnUpdateRightPanelProgress(qnActiveSection);
+        }
+    }
+
+    function collectCurrentAnswers() {
+        const answers = {};
+        document.querySelectorAll('.qn-question-rating-form').forEach(form => {
+            const sphere = form.dataset.sphere;
+            const qid = form.dataset.question;
+            const checked = form.querySelector('input[type="radio"]:checked');
+            if (!answers[sphere]) answers[sphere] = {};
+            if (checked) answers[sphere][qid] = checked.value;
+        });
+        return answers;
+    }
+
+    // ── Results tab ───────────────────────────────────────────────
+    function initResults() {
+        // Results are server-rendered; chart initialization happens in the partial
+        if (typeof initRadarChart === 'function') initRadarChart();
+    }
+
+    // ── Tools tab ─────────────────────────────────────────────────
+    function initTools() {
+        // Highlight already-triggered cards from session memory
+        document.querySelectorAll('.tl-tool-recommendation-card[data-tool-id]').forEach(card => {
+            const id = parseInt(card.dataset.toolId);
+            if (triggeredToolIds.includes(id)) {
+                card.classList.add('tl-tool-recommendation-card--triggered');
+            }
+        });
+        // Tool info modal buttons
+        document.querySelectorAll('[data-tool-info]').forEach(btn => {
+            btn.addEventListener('click', function () {
+                openToolInfoModal(this.dataset.toolInfo);
+            });
+        });
+    }
+
+    // ── Info Modal ────────────────────────────────────────────────
+    function openInfoModal(helpInfo, questionText) {
+        const modal = document.getElementById('analysis-info-modal');
+        if (!modal) return;
+        const headingEl = document.getElementById('analysis-info-modal-question-heading');
+        const bodyEl    = document.getElementById('analysis-info-modal-body');
+        if (headingEl) headingEl.textContent = questionText || 'Question Information';
+        if (bodyEl) {
+            if (helpInfo && helpInfo.trim()) {
+                bodyEl.innerHTML = `<p class="analysis-modal-help-info-text">${helpInfo.replace(/\n/g, '<br>')}</p>`;
+            } else {
+                bodyEl.innerHTML = `<p class="analysis-modal-no-info-placeholder">No additional information is available for this question.</p>`;
+            }
+        }
+        modal.classList.add('active');
+    }
+
+    // ── AI Context Modal ──────────────────────────────────────────
+    function loadAiContext(questionId) {
+        const modal = document.getElementById('ai-context-modal');
+        const body  = document.getElementById('ai-context-body');
+        if (!modal || !body) return;
+        body.innerHTML = '<div class="tab-loading"><div class="tab-loading-spinner"></div></div>';
+        modal.classList.add('active');
+
+        const url = "{{ url_for('analysis.ai_context', question_id=0, analysis_id=analysis.id) }}"
+            .replace('/question/0/', '/question/' + questionId + '/');
+        fetch(url, { headers: { 'X-CSRFToken': CSRF_TOKEN } })
+        .then(r => r.json())
+        .then(data => {
+            const qText   = data.question_content || '';
+            const country = data.country || '';
+            const heading = modal.querySelector('.analysis-modal-heading-text');
+            if (heading) heading.textContent = qText ? 'Q' + (data.question_order || '') + ' — ' + qText.substring(0, 80) + (qText.length > 80 ? '…' : '') : 'AI Analysis';
+
+            if (data.available) {
+                // Map AI score → 1-7 rating cell
+                let rawScore = parseFloat(data.score) || 0;
+                let aiRating = rawScore;
+                if (rawScore > 7)       aiRating = Math.round(1 + (rawScore - 1) / 9 * 6); // 1-10 → 1-7
+                else if (rawScore <= 1) aiRating = Math.round(rawScore * 7);                 // 0-1 → 1-7
+                else                   aiRating = Math.round(rawScore);
+                aiRating = Math.max(1, Math.min(7, aiRating));
+
+                const minLbl = data.scale_min_label || 'Low';
+                const maxLbl = data.scale_max_label || 'High';
+
+                let ratingCells = '';
+                for (let i = 1; i <= 7; i++) {
+                    const active = (i === aiRating) ? ' analysis-modal-ai-rating-cell--active' : '';
+                    ratingCells += `<div class="analysis-modal-ai-rating-cell${active}">${i}</div>`;
+                }
+
+                body.innerHTML = `
+                    <span class="analysis-modal-ai-country-badge">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                        ${country}
+                    </span>
+
+                    <div class="analysis-modal-ai-reasoning-label">AI Rating</div>
+                    <div class="analysis-modal-ai-rating-panel">
+                        ${ratingCells}
+                        <span class="analysis-modal-ai-rated-tag">AI Rated</span>
+                    </div>
+                    <div class="analysis-modal-ai-rating-endpoints">
+                        <span>${minLbl}</span><span>${maxLbl}</span>
+                    </div>
+
+                    <div class="analysis-modal-ai-reasoning-label">Reasoning</div>
+                    <div class="analysis-modal-ai-reasoning-text">${data.comment || 'No reasoning provided.'}</div>
+
+                    <div class="analysis-modal-ai-meta-row">
+                        <div>
+                            <div class="analysis-modal-ai-score-display">${rawScore.toFixed ? rawScore.toFixed(2) : rawScore}</div>
+                            <div style="font-size:0.62rem;color:#9CA3AF;margin-top:0.1rem;">AI Score</div>
+                        </div>
+                        <div style="margin-left:auto;">Generated ${data.timestamp || '—'}</div>
+                    </div>`;
+            } else {
+                body.innerHTML = `<p class="analysis-modal-unavailable-message">${data.message || 'AI analysis not available for this country.'}</p>`;
+            }
+        })
+        .catch(() => {
+            document.getElementById('ai-context-body').innerHTML =
+                `<p class="analysis-modal-unavailable-message" style="color:#991B1B;">Failed to load AI data. Please try again.</p>`;
+        });
+    }
+
+    // ── Comments Modal ────────────────────────────────────────────
+    function openCommentModal(questionId) {
+        const modal = document.getElementById('comment-modal');
+        if (!modal) return;
+        modal.dataset.questionId = questionId;
+        document.getElementById('analysis-comment-new-textarea').value = '';
+        modal.classList.add('active');
+        loadQuestionComments(questionId);
+    }
+
+    function loadQuestionComments(questionId) {
+        const listEl = document.getElementById('analysis-comment-thread-list');
+        if (!listEl) return;
+        listEl.innerHTML = '<div class="tab-loading"><div class="tab-loading-spinner"></div></div>';
+
+        const url = COMMENTS_GET_URL.replace('/0/', '/' + questionId + '/');
+        fetch(url, { headers: { 'X-CSRFToken': CSRF_TOKEN } })
+        .then(r => r.json())
+        .then(data => {
+            if (!data.success || !data.comments || data.comments.length === 0) {
+                listEl.innerHTML = '<div class="analysis-modal-no-comments-placeholder">No comments yet. Be the first to add one.</div>';
+                return;
+            }
+            listEl.innerHTML = data.comments.map(c => {
+                const initial = (c.user_full_name || c.user || '?')[0].toUpperCase();
+                return `
+                <div class="analysis-modal-comment-item">
+                    <div class="analysis-modal-comment-avatar-circle">${initial}</div>
+                    <div class="analysis-modal-comment-bubble">
+                        <span class="analysis-modal-comment-author-name">${c.user_full_name || c.user}</span>
+                        <span class="analysis-modal-comment-date-text">${c.date || ''}</span>
+                        <div class="analysis-modal-comment-body-text">${c.comment}</div>
+                    </div>
+                </div>`;
+            }).join('');
+        })
+        .catch(() => {
+            listEl.innerHTML = '<div class="analysis-modal-no-comments-placeholder" style="color:#991B1B;">Failed to load comments.</div>';
+        });
+    }
+
+    function submitComment() {
+        const modal = document.getElementById('comment-modal');
+        const qid   = modal.dataset.questionId;
+        const text  = document.getElementById('analysis-comment-new-textarea').value.trim();
+        if (!text) return;
+
+        const url = COMMENT_URL.replace('/0/', '/' + qid + '/');
+        fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': CSRF_TOKEN },
+            body: JSON.stringify({ text, analysis_id: ANALYSIS_ID })
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                document.getElementById('analysis-comment-new-textarea').value = '';
+                showToast('Comment posted.');
+                loadQuestionComments(qid);  // refresh thread
+            } else {
+                showToast(data.error || 'Failed to post comment.', 'error');
+            }
+        })
+        .catch(() => showToast('Network error.', 'error'));
+    }
+
+    // ── Generic modal helpers ─────────────────────────────────────
+    function openToolInfoModal(toolId) {
+        const modal = document.getElementById('tool-info-modal');
+        if (!modal) return;
+        modal.dataset.toolId = toolId;
+        modal.classList.add('active');
+    }
+
+    function closeModal(id) {
+        const modal = document.getElementById(id);
+        if (modal) modal.classList.remove('active');
+    }
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.analysis-modal-overlay.active').forEach(m => m.classList.remove('active'));
+        }
+    });
+
+    // ── Bootstrap ─────────────────────────────────────────────────
+    loadTab('questionnaire');
+    </script>
+
+    <!-- ── Info Modal ──────────────────────────────────────────── -->
+    <div id="analysis-info-modal" class="analysis-modal-overlay">
+        <div class="analysis-modal-backdrop-blur" onclick="closeModal('analysis-info-modal')"></div>
+        <div class="analysis-modal-content-panel analysis-modal-content-panel--md">
+            <div class="analysis-modal-panel-header">
+                <div class="analysis-modal-eyebrow-label">About This Question</div>
+                <div class="analysis-modal-heading-text" id="analysis-info-modal-question-heading"></div>
+                <button class="analysis-modal-close-x-button" onclick="closeModal('analysis-info-modal')">&times;</button>
+            </div>
+            <div class="analysis-modal-body-content" id="analysis-info-modal-body"></div>
+        </div>
+    </div>
+
+    <!-- ── AI Analysis Modal ───────────────────────────────────── -->
+    <div id="ai-context-modal" class="analysis-modal-overlay">
+        <div class="analysis-modal-backdrop-blur" onclick="closeModal('ai-context-modal')"></div>
+        <div class="analysis-modal-content-panel analysis-modal-content-panel--md">
+            <div class="analysis-modal-panel-header">
+                <div class="analysis-modal-eyebrow-label">AI Analysis</div>
+                <div class="analysis-modal-heading-text"></div>
+                <button class="analysis-modal-close-x-button" onclick="closeModal('ai-context-modal')">&times;</button>
+            </div>
+            <div class="analysis-modal-body-content" id="ai-context-body"></div>
+        </div>
+    </div>
+
+    <!-- ── Comments Modal ─────────────────────────────────────── -->
+    <div id="comment-modal" class="analysis-modal-overlay" data-question-id="">
+        <div class="analysis-modal-backdrop-blur" onclick="closeModal('comment-modal')"></div>
+        <div class="analysis-modal-content-panel analysis-modal-content-panel--md">
+            <div class="analysis-modal-panel-header">
+                <div class="analysis-modal-eyebrow-label">Discussion</div>
+                <div class="analysis-modal-heading-text">Comments</div>
+                <button class="analysis-modal-close-x-button" onclick="closeModal('comment-modal')">&times;</button>
+            </div>
+            <div class="analysis-modal-body-content">
+                <div class="analysis-modal-comments-thread" id="analysis-comment-thread-list"></div>
+                <hr class="analysis-modal-new-comment-divider">
+                <div class="analysis-modal-new-comment-label">Add a Comment</div>
+                <textarea id="analysis-comment-new-textarea" class="analysis-modal-comment-textarea"
+                          rows="3" placeholder="Write your thoughts about this question…"></textarea>
+                <div class="analysis-modal-comment-submit-row">
+                    <button class="analysis-modal-btn-cancel" onclick="closeModal('comment-modal')">Cancel</button>
+                    <button class="analysis-modal-btn-post-comment" onclick="submitComment()">Post Comment</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
