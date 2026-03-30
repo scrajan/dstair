@@ -22,7 +22,7 @@ ENV/
 
 # ── Flask / SQLite ──────────────────────────────────
 
-*.db
+
 *.sqlite3
 
 .pytest_cache_local/
