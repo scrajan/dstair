@@ -85,7 +85,7 @@
         position: absolute;
         inset: 0;
         z-index: -2;
-        background-image: url("{{ url_for('static', filename='assets/homeImages/how-dstair-diff/hero-1.jpg') }}");
+        background-image: url("{{ url_for('static', filename='assets/homeImages/home-hero.jpg') }}");
         background-size: cover;
         background-position: center;
     }
@@ -94,7 +94,7 @@
         content: '';
         position: absolute;
         inset: 0;
-        background: linear-gradient(180deg, rgba(2, 6, 23, 0.65) 0%, rgba(2, 6, 23, 0.88) 100%);
+        background: linear-gradient(180deg, rgba(2, 6, 23, 0.55) 0%, rgba(2, 6, 23, 0.78) 100%);
     }
 
     .lan-hero::before {
@@ -1079,8 +1079,8 @@
             </div>
 
             <div class="lan-hero-title-box">
-                <h1 class="lan-hero-title js-title-reveal" >
-                    <span class="lan-highlight" >DSTAIR</span><span class="lan-dot"></span>
+                <h1 class="lan-hero-title js-title-reveal">
+                    <span class="lan-highlight">DSTAIR</span><span class="lan-dot"></span>
                 </h1>
             </div>
 
@@ -1091,8 +1091,10 @@
 
             <div class="lan-hero-btns js-btn-reveal">
                 {% if current_user.is_authenticated %}
-                <a href="{{ url_for('dashboard.index', username=current_user.user_account_unique_username_string) }}" class="lan-btn-prim">Run Analysis</a>
-                <a href="{{ url_for('dashboard.index', username=current_user.user_account_unique_username_string) }}" class="lan-btn-sec">Go to Dashboard</a>
+                <a href="{{ url_for('dashboard.index', username=current_user.user_account_unique_username_string) }}"
+                    class="lan-btn-prim">Run Analysis</a>
+                <a href="{{ url_for('dashboard.index', username=current_user.user_account_unique_username_string) }}"
+                    class="lan-btn-sec">Go to Dashboard</a>
                 {% else %}
                 <a href="{{ url_for('auth.login') }}" class="lan-btn-prim">
                     Run Analysis
@@ -1117,7 +1119,7 @@
                         <img src="{{ url_for('static', filename='assets/homeImages/homeImageCorruption.jpg') }}"
                             alt="Corruption" class="lan-ctx-img">
                     </div>
-                    
+
                 </div>
             </div>
 
@@ -1237,7 +1239,8 @@
     <section class="lan-diff">
         <div class="lan-diff-grid-bg"></div>
 
-        <div class="lan-ctx-wrap js-scroll-reveal">
+        <div class="js-scroll-reveal"
+            style="width: 100%; max-width: 1400px; margin: 0 auto; padding: 0 1.5rem; display: flex; justify-content: center;">
             <div class="lan-diff-head">
                 <span class="lan-diff-sup">The Methodology</span>
                 <h2 class="lan-diff-h2">How <span>DSTAIR</span> is Different</h2>
@@ -1249,7 +1252,7 @@
                 <div class="lan-diff-img-wrap">
                     <img src="{{ url_for('static', filename='assets/homeImages/how-dstair-diff/1.jpg') }}"
                         alt="Granular Analysis" class="lan-diff-card-img">
-                 </div>
+                </div>
                 <div class="lan-diff-content">
                     <div class="lan-diff-header">
                         <div class="lan-diff-ico-box">
@@ -1406,8 +1409,8 @@
 
     .lan-diff-head {
         text-align: center !important;
-        max-width: 500rem;
-        margin: 0rem 10rem 5rem 20rem !important;
+        max-width: 800px;
+        margin: 0 auto 4rem auto !important;
         position: relative;
         z-index: 2;
     }
@@ -1507,7 +1510,7 @@
     /* Mobile image height adjustment */
     @media (max-width: 768px) {
         .lan-diff-img-wrap {
-            height: 180px;
+            height: 160px;
         }
     }
 
@@ -1568,8 +1571,71 @@
     }
 
     @media (max-width: 768px) {
+        .lan-diff {
+            padding: 3rem 1.25rem 2rem;
+        }
+
         .lan-diff-content {
-            padding: 2rem 1.5rem;
+            padding: 1.25rem 1.25rem 1.5rem;
+        }
+
+        .lan-diff-ico-box {
+            width: 2.75rem;
+            height: 2.75rem;
+            border-radius: 0.75rem;
+            margin-bottom: 0;
+            flex-shrink: 0;
+        }
+
+        .lan-diff-ico-box svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .lan-diff-h3 {
+            font-size: 1.35rem;
+            margin: 0 0 0.75rem;
+        }
+
+        .lan-diff-header {
+            gap: 0.75rem;
+            margin-bottom: 0.875rem;
+            align-items: center;
+        }
+
+        .lan-diff-p {
+            font-size: 0.92rem;
+            line-height: 1.65;
+        }
+
+        .lan-diff-card {
+            border-radius: 1.25rem;
+        }
+
+        .lan-diff-h2 {
+            font-size: clamp(1.75rem, 7vw, 2.5rem);
+        }
+
+        .lan-diff-grid {
+            gap: 1.25rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .lan-diff-img-wrap {
+            height: 140px;
+        }
+
+        .lan-diff-content {
+            padding: 1rem 1rem 1.25rem;
+        }
+
+        .lan-diff-h3 {
+            font-size: 1.2rem;
+        }
+
+        .lan-diff-p {
+            font-size: 0.875rem;
         }
     }
 

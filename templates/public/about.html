@@ -180,7 +180,7 @@
     }
 
     .abt-mission-panel {
-        background: linear-gradient(145deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.8));
+        background: linear-gradient(145deg, rgba(70, 85, 87, 0.7), rgba(70, 85, 87, 0.8));
         backdrop-filter: blur(24px);
         -webkit-backdrop-filter: blur(24px);
         border: 1px solid rgba(255, 255, 255, 0.08);
@@ -455,7 +455,7 @@
         box-shadow: 0 0 10px rgba(217, 119, 6, 0.5);
     }
 
-    
+
     /* --------------------------------------------------------------------------
    Section 3: Process Grid - Dynamic Step Visuals
    -------------------------------------------------------------------------- */
@@ -1061,7 +1061,7 @@
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.1);
         border-color: rgba(245, 158, 11, 0.4);
         box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), 0 0 20px rgba(245, 158, 11, 0.2);
-        
+
         object-fit: contain;
     }
 
@@ -1073,8 +1073,8 @@
         object-fit: contain;
         border-radius: 2rem;
 
-        
-        
+
+
     }
 
     .abt-ib3-h3 {
@@ -1084,7 +1084,7 @@
         color: #ffffff;
         margin: 0 0 1.25rem 0;
         letter-spacing: -0.02em;
-        
+
     }
 
     .abt-ib3-p {
@@ -1155,45 +1155,240 @@
         text-transform: uppercase;
         letter-spacing: 0.25em;
     }
-    .abt-tellus-color { color: rgb(24, 228, 61); }
+
+    .abt-tellus-color {
+        color: rgb(24, 228, 61);
+    }
 
     /* ==========================================================================
     MOBILE RESPONSIVE — About page
-    Only additive @media blocks. No existing rules touched.
+    Only additive @media blocks. No existing desktop rules touched.
     ========================================================================== */
     @media (max-width: 768px) {
-        /* Hero: reduce massive top/bottom padding */
+
+        /* ── Hero ── */
         .abt-hero {
-            padding: 7rem 1.25rem 5rem;
-            background-attachment: scroll; /* fixed bg causes jank on mobile */
+            padding: 6rem 1.25rem 3.5rem;
+            background-attachment: scroll;
         }
 
-        /* Ensure sections have comfortable mobile padding */
-        .abt-ib2, .abt-ib3 {
-            padding-left: 1.25rem;
-            padding-right: 1.25rem;
+        .abt-hero-h1 {
+            font-size: clamp(2.25rem, 10vw, 3.5rem);
+            line-height: 1.05;
+            margin: 0 0 2rem;
+            letter-spacing: -0.02em;
         }
 
-        /* Stack any remaining side-by-side layouts */
-        .abt-ib3-inner {
-            flex-direction: column;
+        .abt-hero-sup {
+            margin-bottom: 1.25rem;
+            letter-spacing: 0.2em;
+            font-size: 0.7rem;
         }
 
-        .abt-ib3-left, .abt-ib3-right {
-            width: 100%;
+        .abt-mission-panel {
+            padding: 1.5rem 1.25rem;
+            border-radius: 1.25rem;
         }
 
-        .abt-ib3-right {
-            padding-left: 0;
-            border-left: none;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            padding-top: 2rem;
+        .abt-mission-h2 {
+            font-size: 1.2rem;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+            letter-spacing: 0.02em;
+        }
+
+        /* hide the decorative growing line on narrow screens */
+        .abt-mission-h2::after {
+            display: none;
+        }
+
+        .abt-mission-p {
+            font-size: 0.95rem;
+            margin-bottom: 1.25rem;
+            line-height: 1.7;
+        }
+
+        .abt-mission-sub {
+            font-size: 0.875rem;
+            padding-left: 1rem;
+            line-height: 1.65;
+        }
+
+        /* ── Def section (What is DSTAIR) ── */
+        .abt-def {
+            padding: 3rem 1.25rem;
+        }
+
+        .abt-def-grid {
+            gap: 1.5rem;
+        }
+
+        .abt-def-card {
+            border-radius: 2rem;
+        }
+
+        .abt-def-img {
+            height: 200px;
+        }
+
+        .abt-def-cinner {
+            padding: 1.5rem;
+        }
+
+        .abt-def-h3 {
+            font-size: 1.35rem;
+            gap: 0.75rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .abt-def-ico {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 0.75rem;
+            font-size: 1.25rem;
+        }
+
+        .abt-def-txt {
+            font-size: 0.95rem;
+        }
+
+        /* ── Process section ── */
+        .abt-proc {
+            background-attachment: scroll;
+        }
+
+        .abt-proc-head {
+            margin-bottom: 2.5rem;
+        }
+
+        .abt-proc-step {
+            padding: 1.5rem;
+            border-radius: 2rem;
+        }
+
+        .abt-proc-h4 {
+            font-size: 1.25rem;
+        }
+
+        .abt-proc-txt {
+            font-size: 0.95rem;
+        }
+
+        .abt-proc-icon-box {
+            width: 3rem;
+            height: 3rem;
+            font-size: 1.1rem;
+        }
+
+        /* ── Info track (last section) ── */
+        .abt-info {
+            padding: 3rem 1.25rem;
+        }
+
+        .abt-info-wrap {
+            gap: 2rem;
+        }
+
+        .abt-info-box {
+            border-radius: 1.5rem;
+        }
+
+        .abt-ib1-img {
+            height: 200px;
+        }
+
+        .abt-ib1-cont {
+            padding: 1.5rem;
+        }
+
+        .abt-ib1-h3 {
+            font-size: 1.35rem;
+            margin-bottom: 1rem;
+        }
+
+        .abt-ib1-p {
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        .abt-ib1-bot {
+            margin-top: 1.5rem;
+            padding-top: 1.25rem;
+        }
+
+        /* Recommendations box */
+        .abt-ib2 {
+            border-radius: 1.5rem;
+        }
+
+        .abt-ib2-inner {
+            padding: 1.5rem !important;
+            gap: 1.5rem;
+        }
+
+        .abt-ib2-h3 {
+            font-size: 1.35rem;
+            line-height: 1.3;
+        }
+
+        .abt-ib2-badge-wrap {
+            margin-bottom: 1rem;
+        }
+
+        .abt-ib2-right {
+            grid-template-columns: 1fr;
+        }
+
+        .abt-ib2-stitle {
+            font-size: 0.875rem;
         }
     }
 
     @media (max-width: 480px) {
         .abt-hero {
-            padding: 6rem 1rem 4rem;
+            padding: 5.5rem 1rem 3rem;
+        }
+
+        .abt-hero-h1 {
+            font-size: clamp(2rem, 11vw, 2.5rem);
+            margin: 0 0 1.5rem;
+        }
+
+        .abt-mission-panel {
+            padding: 1.25rem 1rem;
+        }
+
+        .abt-mission-h2 {
+            font-size: 1.05rem;
+        }
+
+        .abt-mission-p {
+            font-size: 0.875rem;
+        }
+
+        .abt-mission-sub {
+            font-size: 0.8rem;
+        }
+
+        .abt-def {
+            padding: 2.5rem 1rem;
+        }
+
+        .abt-ib1-h3,
+        .abt-ib2-h3 {
+            font-size: 1.2rem;
+        }
+
+        .abt-info {
+            padding: 2.5rem 1rem;
+        }
+
+        .abt-ib2-inner {
+            padding: 1.25rem !important;
+        }
+
+        .abt-ib2-right {
+            grid-template-columns: 1fr;
         }
     }
 </style>
@@ -1446,7 +1641,7 @@
                 </div>
             </article>
 
-            
+
 
         </div>
     </section>

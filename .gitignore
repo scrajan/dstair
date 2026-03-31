@@ -21,10 +21,10 @@ ENV/
 .venv/
 
 # ── Flask / SQLite ──────────────────────────────────
-
-
+instance/
+*.db
 *.sqlite3
-
+static/uploads/
 .pytest_cache_local/
 .tmp_pytest_tmp/
 tests_runtime/

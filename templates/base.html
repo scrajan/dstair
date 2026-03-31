@@ -35,8 +35,12 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
 
 
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='assets/general/logo.png') }}">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='assets/general/logo.png') }}">
+
     <!-- Main Custom CSS File (Contains Tailwind component definitions) -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}?v={{ range(1000,9999) | random }}">
 
     <!-- Injection point for page-specific CSS files -->
     {% block extra_css %}{% endblock %}

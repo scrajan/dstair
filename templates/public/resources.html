@@ -1316,11 +1316,84 @@
     .res-no-deco { text-decoration: none; }
     .res-text-accent { color: #5cfb00; }
 
-    /* Mobile: disable fixed background attachment (causes jank on iOS Safari) */
+    /* ==========================================================================
+    MOBILE RESPONSIVE — Resources page
+    ========================================================================== */
     @media (max-width: 768px) {
+        /* ── Hero ── */
+        .res-hero {
+            padding: 6rem 1.25rem 3.5rem;
+            min-height: unset;
+        }
+        .res-hero-wrap {
+            padding-bottom: 2rem;
+        }
+        .res-hero-h1 {
+            font-size: clamp(2.5rem, 11vw, 4rem);
+            line-height: 1.05;
+            margin: 0 0 1.5rem;
+            letter-spacing: -0.02em;
+        }
+        .res-hero-badge {
+            margin-bottom: 1.5rem;
+        }
+        .res-hero-p {
+            font-size: 0.975rem;
+            line-height: 1.75;
+        }
+
+        /* ── Section headers (big number + title) ── */
+        .res-sec {
+            padding: 3.5rem 1.25rem;
+        }
+        .res-sec-head {
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: flex-end;
+        }
+        .res-sec-num {
+            font-size: 3.5rem;
+            line-height: 1;
+        }
+        .res-sec-h2 {
+            font-size: clamp(1.5rem, 6vw, 2rem);
+        }
+        .res-sec-line {
+            display: none;
+        }
+
+        /* ── Core cards ── */
+        .res-card-glass,
+        .res-card-special {
+            border-radius: 2rem;
+            padding: 2rem 1.5rem;
+        }
+        .res-card-h3 {
+            font-size: 1.35rem;
+        }
+
+        /* ── Laws section ── */
         .res-laws {
             background-attachment: scroll;
         }
+
+        /* ── Data indexes cards ── */
+        .res-dt-card {
+            border-radius: 2rem;
+            padding: 1.75rem;
+        }
+        .res-dt-h4 {
+            font-size: 1.2rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .res-hero { padding: 5.5rem 1rem 3rem; }
+        .res-hero-h1 { font-size: clamp(2.1rem, 12vw, 2.75rem); }
+        .res-sec { padding: 2.5rem 1rem; }
+        .res-sec-num { font-size: 2.75rem; }
+        .res-card-glass, .res-card-special { padding: 1.5rem 1.25rem; border-radius: 1.5rem; }
+        .res-dt-card { padding: 1.5rem; border-radius: 1.5rem; }
     }
 </style>
 {% endblock %}

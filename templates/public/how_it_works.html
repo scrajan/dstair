@@ -754,12 +754,102 @@
         color: black;
     }
 
-    /* Mobile: disable fixed background attachment (causes jank on iOS Safari) */
+    /* ==========================================================================
+    MOBILE RESPONSIVE — How It Works page
+    ========================================================================== */
     @media (max-width: 768px) {
+        /* ── Hero ── */
         .hiw-hero {
             background-attachment: scroll !important;
-            padding: 6rem 1.25rem 4rem !important;
+            padding: 6rem 1.25rem 3.5rem !important;
         }
+        .hiw-hero-h1 {
+            font-size: clamp(2.5rem, 10vw, 3.5rem);
+            line-height: 1.05;
+            margin: 0 0 1.75rem;
+            letter-spacing: -0.02em;
+        }
+        .hiw-hero-p {
+            font-size: 1rem;
+            padding-left: 1.1rem;
+            line-height: 1.75;
+        }
+
+        /* ── Section 2: Spheres ── */
+        .hiw-spheres {
+            padding: 4rem 1.25rem 3.5rem;
+        }
+        .hiw-spheres-head {
+            margin-bottom: 2.5rem;
+        }
+        .hiw-spheres-h2 {
+            font-size: clamp(2.25rem, 9vw, 3.5rem);
+            line-height: 1.05;
+        }
+        .hiw-sph-card {
+            border-radius: 2rem;
+        }
+        .hiw-sph-img-wrap {
+            height: 11rem;
+        }
+        .hiw-sph-body {
+            padding: 1.5rem 1.5rem 2rem;
+        }
+        .hiw-sph-h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+        }
+        .hiw-sph-p {
+            font-size: 0.875rem;
+            line-height: 1.65;
+        }
+
+        /* ── Section 3: Timeline (last section) ── */
+        .hiw-time {
+            padding: 3rem 1.25rem;
+        }
+        .hiw-time-head {
+            margin-bottom: 3.5rem;
+        }
+        .hiw-time-h2 {
+            font-size: clamp(2rem, 9vw, 3rem);
+            line-height: 1.05;
+        }
+        .hiw-time-steps {
+            gap: 4rem;
+        }
+        .hiw-ts-row {
+            gap: 2rem;
+        }
+        .hiw-ts-img {
+            border-radius: 1.5rem;
+            max-width: 100%;
+        }
+        .hiw-ts-h3 {
+            font-size: clamp(1.6rem, 7vw, 2rem);
+            line-height: 1.1;
+            margin-bottom: 1rem;
+        }
+        .hiw-ts-p {
+            font-size: 0.9375rem;
+            line-height: 1.75;
+        }
+        .hiw-ts-box {
+            padding: 1.5rem;
+            border-radius: 1.25rem;
+            margin-top: 1.5rem;
+        }
+        .hiw-ts-box li {
+            font-size: 0.9rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .hiw-spheres { padding: 3rem 1rem 3rem; }
+        .hiw-sph-body { padding: 1.25rem 1.25rem 1.75rem; }
+        .hiw-time { padding: 2.5rem 1rem; }
+        .hiw-time-steps { gap: 3rem; }
+        .hiw-ts-h3 { font-size: 1.5rem; }
     }
 </style>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">

@@ -382,16 +382,44 @@
     }
     .resize-v { resize: vertical; }
 
-    /* Mobile polish */
-    @media (max-width: 480px) {
+    /* ==========================================================================
+    MOBILE RESPONSIVE — Contact page
+    ========================================================================== */
+    @media (max-width: 768px) {
+        .contact-wrapper {
+            padding: 5.5rem 1rem 3rem;
+        }
+        .contact-hero {
+            margin-bottom: 2rem;
+        }
+        .contact-card {
+            border-radius: 2rem;
+            padding: 1.5rem;
+        }
+        /* PI photo: smaller on mobile */
+        .contact-pi-img-wrap {
+            width: 160px;
+            height: 160px;
+        }
+        .contact-pi-name {
+            font-size: 1.25rem;
+        }
+        /* Org logo: full-width on mobile */
         .contact-org-logo {
             width: 100%;
             max-width: 200px;
         }
         .contact-org-head {
             flex-direction: column;
+            align-items: center;
             text-align: center;
         }
+    }
+
+    @media (max-width: 480px) {
+        .contact-wrapper { padding: 5rem 0.875rem 2.5rem; }
+        .contact-card { border-radius: 1.5rem; padding: 1.25rem; }
+        .contact-pi-img-wrap { width: 130px; height: 130px; }
     }
 </style>
 {% endblock %}

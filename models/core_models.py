@@ -100,7 +100,7 @@ class Question(ActiveRecordMixin, db.Model):
         from models.core_models import Comment
         return db.session.query(cls).join(Comment).distinct().all()
 
-    def add_comment(self, new_comment_dict: dict, analysis_id: int = None) -> Comment:
+    def add_comment(self, new_comment_dict: dict, analysis_id: int = None) -> "Comment":
         """Adds a new comment to this question, persisting it via ActiveRecord pattern."""
         try:
             created_at = datetime.strptime(new_comment_dict.get('date', ''), '%m/%d/%Y %I:%M:%S %p')
